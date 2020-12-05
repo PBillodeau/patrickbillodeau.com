@@ -1,0 +1,218 @@
+<html>
+	<head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link rel="icon" href="data:;base64,iVBORw0KGgo=">
+        <title>Patrick Billodeau</title>
+	<style>
+			html, body, h1, h2, h3, h4 {
+	margin: 0;
+	padding: 0;
+	font-family: Arial,Helvetica Neue,Helvetica,sans-serif;
+	line-height: 2rem;
+}
+
+html {
+	padding: 10px 0;
+}
+
+h1 {
+	color: #777;
+}
+
+h2.title {
+	color: orange;
+}
+
+.resume {
+	margin: 0 20px;
+}
+
+.section {
+	margin: 20px 0;
+}
+
+.items {
+	background-color: #efefef;
+	border: 1px solid #ddd;
+	box-shadow: 2px 2px 2px 1px #ddd;
+	color: #333;
+	border-radius: 2px;
+	padding: 10px;
+}
+
+.item {
+	margin: 10px 0;
+}
+
+.date {
+	color: #777;
+}
+
+@media (min-width: 768px) {
+	.resume {
+		margin: auto;
+		max-width: 1376px;
+	}
+
+	h1 {
+		margin-left: 20%;
+	}
+
+	.left, .right {
+		float: left;
+	}
+
+	.left {
+		width: 30%;
+		margin-left: -10%;
+	}
+
+	.right {
+		width: 70%;
+	}
+
+	.title {
+		text-align: right;
+		padding: 0 20px;
+	}
+
+	.items {
+		padding: 10px 30px;
+	}
+
+	.details {
+		padding: 0 10px;
+	}
+
+	/* https://css-tricks.com/snippets/css/clear-fix/ */
+	.section:after {
+		visibility: hidden;
+		display: block;
+		font-size: 0;
+		content: " ";
+		clear: both;
+		height: 0;
+	}
+
+	* html .section             { zoom: 1; } /* IE6 */
+	*:first-child+html .section { zoom: 1; } /* IE7 */
+}
+
+ul {
+	margin-top: 0;
+}
+
+li {
+	line-height: 1.5;
+	padding: 3px 0;
+}
+	</style>
+	</head>
+	<body>
+        <div class="resume">
+			<h1>Patrick Billodeau</h1>
+			<div class="section skills">
+				<div class="left">
+					<h2 class="title">Skills</h2>
+				</div>
+				<div class="right">
+					<div class="items">
+						<div class="item">
+							<h3 class="category">Languages</h3>
+							<div class="details">
+								ECMAScript (Javascript), PHP, SQL, CSS, HTML, C, Bash
+							</div>
+							</div>
+							<div class="item">
+								<h3 class="category">Tools</h3>
+								<div class="details">
+									Webpack, Git, Jenkins, ELK Stack, Ansible, Docker
+								</div>
+							</div>
+							<div class="item">
+								<h3 class="category">Frameworks</h3>
+								<div class="details">
+									React, Drupal 8, Bootstrap
+								</div>
+							</div>
+							<div class="item">
+								<h3 class="category">OS</h3>
+								<div class="details">
+									Debian based distros (Arch when I'm feeling fancy), Windows
+								</div>
+							</div>
+						</div>
+					</div>
+                </div>
+                <div class="section experience">
+					<div class="left">
+						<h2 class="title">Experience</h2>
+					</div>
+					<div class="right">
+						<div class="items">
+							<div class="item">
+								<h3 class="category">M-State - <small class="date">July 2016 - Present</small></h3>
+								<h4 class="sub-category">Front-end Developer</h4>
+								<div class="details">
+									<ul>
+										<li>Official title is a bit misleading, I'm a full-stack developer</li>
+										<li>Lead developer for college’s new front-facing website <a href='https://www.minnesota.edu' target='_blank'>minnesota.edu</a>. Everything from theme implementation to the custom back-end code to integration with other applications (Drupal 8)</li>
+										<li>Led the development of several front-end applications using React and Redux </li>		
+										<li>Led transition from bare-metal to VM servers. Also including an upgrade from PHP 5 to PHP 7</li>
+										<li>Update, backup, and monitor production servers</li>									
+										<li>“Dockerized” all applications for easy dev environment setups</li>							
+										<li>Orchestrated continuous integration system for web applications using Jenkins</li>
+									</ul>
+								</div>
+							</div>
+							<div class="item">
+								<h3 class="category">Clifton Labs - <small class="date">May 2014 - July 2016</small></h3>
+								<h4 class="sub-category">Systems Engineer</h4>
+								<div class="details">
+									<ul>
+										<li>Developed embedded C VOIP applications for devices that interfaced with various types of radios</li>
+										<li>Setup a continuous integration system for web applications using Jenkins</li>
+										<li>Managed local continuous integration servers that combined many different micro-services</li>
+									</ul>
+								</div>
+							</div>
+							<div class="item">
+								<h3 class="category">North Dakota State University - <small class="date">August 2011 - May 2014</small></h3>
+								<h4 class="sub-category">Teaching Assistant</h4>
+								<div class="details">
+									<ul>
+										<li>Independently led and taught ~25 students in 2 hour physics labs</li>
+										<li>Created lesson introductions, graded assignments, and held office hours</li>
+									</ul>
+								</div>
+							</div>
+							<div class="item">
+								<h3 class="category">81 Designs (now Codelation) - <small class="date">February 2013 - August 2013</small></h3>
+								<h4 class="sub-category">Web Intern</h4>
+								<div class="details">
+									<ul>
+										<li>Helped develop many types of Wordpress sites for external customers</li>
+									</ul>
+								</div>
+							</div>
+						</div>
+					</div>
+                </div>
+                <div class="section education">
+					<div class="left">
+						<h2 class="title">Education</h2>
+					</div>
+					<div class="right">
+						<div class="items">
+							<div class="item">
+								<h3 class="category">North Dakota State University - <small class="date">August 2010 - May 2014</small></h3>
+								<h4 class="sub-category">B.S. Electrical Engineering</h4>
+								<div class="details">GPA: 3.95</div>
+							</div>
+						</div>
+					</div>
+                </div>
+        </div>
+	</body>
+</html>

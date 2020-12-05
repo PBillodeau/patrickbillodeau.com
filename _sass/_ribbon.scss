@@ -1,0 +1,47 @@
+@keyframes gradient {
+	0% {
+		background-position: 0% 50%;
+	}
+	50% {
+		background-position: 100% 50%;
+	}
+	100% {
+		background-position: 0% 50%;
+	}
+}
+
+.ribbon {
+	background-color: navy;
+	background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+	background-size: 400% 400%;
+	animation: gradient 15s ease infinite;
+	border-top: 1px solid #333;
+	border-bottom: 1px solid #333;
+	box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+	color: #fff;
+}
+
+.ribbon h1,
+.ribbon img {
+	display: inline-block;
+}
+
+.ribbon h1 {
+	color: #fff;
+}
+
+.ribbon .container {
+	align-items: center;
+}
+
+.details, .image {
+	text-align: center;
+	min-width: 300px;
+	display: flex;
+	justify-content: center;
+}
+
+.ribbon img {
+	border-radius: 50%;
+	border: 2px solid #fff;
+}

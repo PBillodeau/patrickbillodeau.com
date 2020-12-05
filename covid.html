@@ -1,0 +1,208 @@
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>COVID-19 Graphs</title>
+        <link rel="preconnect" href="https://fonts.gstatic.com">
+        <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet"> 
+        <style>
+            html {
+                font-family: 'Montserrat', sans-serif;
+                font-size: 1.25rem;
+                background-color: #fff;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="app" style="margin: 0 1rem;">
+            <p>
+                I saw this image on Facebook: <p><img src='/img/covid.jpg'></p> The implication was pretty strong, but it didn't really provide much information/context to it. I wanted to know more. Luckily, after looking into the data-source, I found that there was an API available. I finally had an excuse to build my own COVID-19 dashboard. 
+            </p>
+
+            <p>
+                There were a few things I wanted to know from the original graph:
+                <ol>
+                    <li>Actual numbers</li>
+                    <li>Breakdown by state/territory</li>
+                    <li>Mask mandates by state (and when they went into effect)</li>
+                </ol>
+            </p>
+
+            <p>
+                In the graphs below, red values are taken from dates without a mask mandate, blue values are taken from dates with a mask mandate, and grey values are unknown.
+            </p>
+    
+            <label for='state'>State</label>
+            <select name="state" id="state" onchange="update()" style="width: 100%; height: 40px;">
+                <option></option>
+                <option value="AL">AL</option>
+                <option value="AK">AK</option>
+                <option value="AZ">AZ</option>
+                <option value="AR">AR</option>
+                <option value="AS">AS</option>
+                <option value="CA">CA</option>
+                <option value="CO">CO</option>
+                <option value="CT">CT</option>
+                <option value="DC">DC</option>
+                <option value="DE">DE</option>
+                <option value="FL">FL</option>
+                <option value="GA">GA</option>
+                <option value="GU">GU</option>
+                <option value="HI">HI</option>
+                <option value="ID">ID</option>
+                <option value="IL">IL</option>
+                <option value="IN">IN</option>
+                <option value="IA">IA</option>
+                <option value="KS">KS</option>
+                <option value="KY">KY</option>
+                <option value="LA">LA</option>
+                <option value="ME">ME</option>
+                <option value="MD">MD</option>
+                <option value="MA">MA</option>
+                <option value="MI">MI</option>
+                <option value="MN">MN</option>
+                <option value="MS">MS</option>
+                <option value="MO">MO</option>
+                <option value="MP">MP</option>
+                <option value="MT">MT</option>
+                <option value="NE">NE</option>
+                <option value="NV">NV</option>
+                <option value="NH">NH</option>
+                <option value="NJ">NJ</option>
+                <option value="NM">NM</option>
+                <option value="NY">NY</option>
+                <option value="NC">NC</option>
+                <option value="ND">ND</option>
+                <option value="OH">OH</option>
+                <option value="OK">OK</option>
+                <option value="OR">OR</option>
+                <option value="PA">PA</option>
+                <option value="PR">PR</option>
+                <option value="RI">RI</option>
+                <option value="SC">SC</option>
+                <option value="SD">SD</option>
+                <option value="TN">TN</option>
+                <option value="TX">TX</option>
+                <option value="UT">UT</option>
+                <option value="VT">VT</option>
+                <option value="VA">VA</option>
+                <option value="VI">VI</option>
+                <option value="WA">WA</option>
+                <option value="WV">WV</option>
+                <option value="WI">WI</option>
+                <option value="WY">WY</option>
+            </select>
+              
+            <div id="graphs" style="width: 100%; margin: auto; display: flex; flex-wrap: wrap;"></div>
+            
+            <h2>Conclusions</h2>
+            <p>
+                Really, I have no clue. These graphs are still very basic, and don't provide a lot context. I just wanted a chance to play with the data myself, and to improve on the original Facebook graph. There are studies that show that mask mandates are effective, and they were analyzed by people much more knowledgable than me: <a href="https://www.npr.org/sections/health-shots/2020/11/23/937173060/mask-mandates-work-to-slow-spread-of-coronavirus-kansas-study-finds">NPR: Mask Mandates Work To Slow Spread Of Coronavirus, Kansas Study Finds</a>
+            </p>
+    
+            <p style="width: 100%;">Case data: <a href="https://covidtracking.com/">https://covidtracking.com/</a></p> 
+            <p style="width: 100%;">Mandate data: <a href="https://masks4all.co/what-states-require-masks/">https://masks4all.co/what-states-require-masks/</a></p>
+        </div>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.min.js"></script>
+        <script src="/data/data.js"></script>
+        <script src="/data/mandates.js"></script>
+        <script>
+            function mapData() {   
+                function color(state, date) {
+                    if (mandates[state] === -1) {
+                        return 'grey'
+                    } else if (mandates[state] === 0 || date < mandates[state]) {
+                        return 'red'
+                    } else {
+                        return 'blue'
+                    }
+                }
+    
+                var values = {}
+                data.forEach(el =>{
+                    values[el.state] = values[el.state] || {}
+                    
+                    values[el.state]['new'] = values[el.state]['new'] || {}
+                    values[el.state]['new'].data = values[el.state]['new'].data || []
+                    values[el.state]['new'].colors = values[el.state]['new'].colors || []
+                    values[el.state]['new'].dates = values[el.state]['new'].dates || []
+                    values[el.state]['new'].data.unshift(el.positiveIncrease)
+                    values[el.state]['new'].colors.unshift(color(el.state, el.date))
+                    values[el.state]['new'].dates.unshift(el.date)
+    
+                    values[el.state]['total'] = values[el.state]['total'] || {}
+                    values[el.state]['total'].data = values[el.state]['total'].data || []
+                    values[el.state]['total'].colors = values[el.state]['total'].colors || []
+                    values[el.state]['total'].dates = values[el.state]['total'].dates || []
+                    values[el.state]['total'].data.unshift(el.positive)
+                    values[el.state]['total'].colors.unshift(color(el.state, el.date))
+                    values[el.state]['total'].dates.unshift(el.date)
+                })
+    
+                return values
+            }
+            
+            var values = mapData()
+            var chartTypes = {
+                new: {
+                    label: 'New positive cases',
+                    type: 'bar'
+                }, 
+                total: {
+                    label: 'Total cases',
+                    type: 'line'
+                }
+            }
+    
+            function update() {
+                var typeSelector = document.getElementById("type")
+                var stateSelector = document.getElementById("state")
+                var state = stateSelector.value
+
+                Object.keys(values[state]).forEach(cat => {
+                    if (document.getElementById(cat) != null)
+                        document.getElementById(cat).remove()
+
+                    var canvas = document.createElement("canvas");
+                    canvas.id = cat
+                    canvas.height = '250'
+                    var canvasContainer = document.createElement("div")
+                    canvasContainer.style = "width: 50%; min-width: 300px; margin: auto;"
+                    canvasContainer.appendChild(canvas)
+                    document.getElementById('graphs').appendChild(canvasContainer)
+        
+                    var ctx =  document.getElementById(cat).getContext('2d')
+                    
+        
+                    var myChart = new Chart(ctx, {
+                        type: chartTypes[cat].type,
+                        data: {
+                            labels: values[state][cat].dates,
+                            datasets: [{
+                                data: values[state][cat].data,
+                                backgroundColor: values[state][cat].colors,
+                                borderColor: values[state][cat].colors
+                            }]
+                        },
+                        options: {
+                            scales: {
+                                yAxes: [{
+                                    ticks: {
+                                        beginAtZero: true
+                                    }
+                                }]
+                            },
+                            title: {
+                                display: true,
+                                text: chartTypes[cat].label
+                            },
+                            legend: {
+                                display: false
+                            }
+                        }
+                    })
+                })
+            }
+        </script>
+    </body>
+</html>

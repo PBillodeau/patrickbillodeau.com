@@ -1,0 +1,50 @@
+#outside {
+  z-index: 1;
+  position: absolute;
+  background-color: #FFE4B5;
+  width: 100%;
+  height: 100%;
+  text-align: center;
+  transition: 1s;
+  transform-origin: 0;
+}
+
+.open-card {
+  transform: rotateY(90deg);
+}
+
+#outside-title {
+  color: black;
+  font-family: 'Poppins', sans-serif;
+  font-size: 32pt;
+  text-align: center;
+}
+
+#inside {
+  z-index: 0;
+  position: absolute;
+  background-color: #FFFACD;
+  width: 100%;
+  height: 100%;
+  text-align: center;
+}
+
+#inside-pic {
+  margin: 50px;
+}
+
+#message {
+  color: black;
+  font-family: 'Poppins', sans-serif;
+  font-size: 20pt;
+  text-align: center;
+  margin: 20px;
+}
+
+button {
+  background: #fff;
+  border-radius: 5px;
+  padding:20px 40px;
+  cursor: pointer;
+  
+}
