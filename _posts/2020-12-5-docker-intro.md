@@ -212,7 +212,7 @@ For example, with our Wordpress site, we had to run a couple of commands that ea
 version: '3.3'
 
 services:
-   db:
+   mysql:
      image: mysql:latest
      environment:
        MYSQL_ROOT_PASSWORD: wordpress
@@ -225,7 +225,7 @@ services:
        - db
      image: wordpress:latest
      ports:
-       - "8080:80"
+       - "80:80"
 ```
 
 and then run
