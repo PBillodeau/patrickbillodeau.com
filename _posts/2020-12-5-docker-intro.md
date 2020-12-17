@@ -25,11 +25,11 @@ Supervisor: "Well, we can't ship your machine to production!"
 
 Developer: Unless...
 
-Developer: "So yeah, not sure why it only works on my machine, bu I created this tool that allows me to deploy my machine to production. Problem solved!"
+Developer: "So yeah, not sure why it only works on my machine, but I created this tool that allows me to deploy my machine to production. Problem solved!"
 
 It sounds ridiculous, and it is, but the ramifications were huge. Applications could be bundled with all of their dependencies. Config could be handled by the developer, not the user. People started to run with it.
 
-People could A/B test similar applications quickly -- without worrying about the implementation of each. They could run the applications without worrying about polluting their host machine. As soon as they were done with an application, they could remove it. The application was completely compartmentalized. The barrier to entry was dramatically reduced. People could spend more time developing their ideas rather than setting up someone elses.
+People could A/B test similar applications quickly -- without worrying about the implementation of each. They could run the applications without worrying about polluting their host machine. As soon as they were done with an application, they could remove it. The application was completely compartmentalized. The barrier to entry was dramatically reduced. People could spend more time developing their ideas rather than setting up someone else's.
 
 Let me show you what I mean.
 
@@ -112,7 +112,7 @@ and navigate your web browser to http://localhost:8600 to play infinite mario.
 
 Really, I think the answer is a bit boring: Docker is just an abstraction. It's a tool to give developers an easy-to-use interface to create and manage containers. 
 
-Still, it's intersting to know what we're working with. Docker comes in two parts: the client and the server. 
+Still, it's interesting to know what we're working with. Docker comes in two parts: the client and the server. 
 
 ## Docker Client
 
@@ -204,7 +204,7 @@ It can't be found. We've successfully "containerized" PHP! At a high-level, this
 
 ## Docker Compose
 
-The example Docker commands are fairly long and involve a lot of different parameters and settings to work right. [Docker Compose](https://docs.docker.com/compose/) give us a way to put all of that complexity into a simple file to make them easier to run. I almost always use Docker Compose to run my images. 
+The example Docker commands are fairly long and involve a lot of different parameters and settings to work right. [Docker Compose](https://docs.docker.com/compose/) gives us a way to put all of that complexity into a simple file to make them easier to run. I almost always use Docker Compose to run my images. 
 
 For example, with our Wordpress site, we had to run a couple of commands that each had a bit of configuration to them. Instead, we could have written a Docker Compose file:
 
@@ -239,7 +239,7 @@ and you're done. You can then check this file into your version control system t
 
 ## Creating custom images with Dockerfiles
 
-Our faketainer was cool, but a little janky. Docker images are created wiht "Dockerfiles." Text files that describe, step by step, wha tthe file structure of the container should look like. Find out more about [Dockerfiles](https://docs.docker.com/engine/reference/builder/).
+While I think the faketainer is cool, it's a little "hacky." Docker images are created with "Dockerfiles." Text files that describe, step by step, what the file structure of the container should look like. Find out more about [Dockerfiles](https://docs.docker.com/engine/reference/builder/).
 
 ## Kubernetes
 
@@ -253,8 +253,8 @@ Developer: Unless...
 
 As so [Kubernetes](https://kubernetes.io/) was born.
 
-Kubernetes allows us to manage our containers across multiple machines. This is incredibly useful in scaling and application and in redudancy. If one server shuts down, Kubernetes can be setup to move the contiainers to another, still running, server. It also allows us to use the resources from multiple computers rather than one super-powerful computer. It puts an abstraction layer across ever server, so that we can treat all of our servers as "the cloud." With Kubernetes, software engineers have lost all credibility with hardware engineers. 
+Kubernetes allows us to manage our containers across multiple machines. This is incredibly useful in scaling applications and creating server redundancy. If one server shuts down, Kubernetes can be set up to move the containers to another, still running, server. It also allows us to use the resources from multiple computers rather than one super-powerful computer. It puts an abstraction layer across ever server, so that we can treat all of our servers as "the cloud." With Kubernetes, software engineers have lost all credibility with hardware engineers. Still awesome though.
 
 # Final thoughts
 
-This article was inspired by a talk I wanted to give for [Curiosity week 2020](https://curiosityweek2020.sched.com/). I hope you found it helpful. If you have any feedback, I'm happy to hear it, or answer any questions you may have -- just shoot me a message on LinkedIn!
+This article was inspired by a talk I wanted to give for [Curiosity week 2020](https://curiosityweek2020.sched.com/). I hope you found it helpful. If you have any feedback, I'm happy to hear it, or answer any questions you may have -- just shoot me a message on [LinkedIn](https://www.linkedin.com/in/patrickbillodeau/)!
