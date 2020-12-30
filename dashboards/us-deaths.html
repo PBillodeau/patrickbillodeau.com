@@ -1,0 +1,101 @@
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Weekly Deaths in the United States</title>
+        <link rel="preconnect" href="https://fonts.gstatic.com">
+        <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet"> 
+        <style>
+            html {
+                font-family: 'Montserrat', sans-serif;
+                font-size: 1.25rem;
+                background-color: #fff;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="app" style="margin: 0 1rem;">
+            
+            <div id="graphs" style="width: 95%; max-width: 1000px; margin: auto;"></div>
+            <div style='text-align: center; border: 1px solid #333; width: 95%; max-width: 1000px; margin: 20px auto; background-color: #efefef;'>
+                <div style="padding: 10px 0;">Total Deaths (2019): <span id='total2019' style='font-weight: bold;'></span></div>
+                <div style="padding: 10px 0;">Total Deaths (2020) (incomplete): <span id='total2020' style='font-weight: bold;'></span></div>
+                <div style="padding: 10px 0;">Underlying COVID-19 Deaths (2020): <span id='covid2020' style='font-weight: bold;'></span></div>
+            </div>
+            
+            <p style="width: 100%; text-align: center;">Source: <a href="https://data.cdc.gov/NCHS/Weekly-Counts-of-Deaths-by-State-and-Select-Causes/muzy-jte6">https://data.cdc.gov/NCHS/Weekly-Counts-of-Deaths-by-State-and-Select-Causes/muzy-jte6</a></p> 
+        </div>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.min.js"></script>
+        <script src="./death-data.js"></script>
+        <script>
+            function mapData() {      
+                var values = {}
+
+                data.forEach(el =>{
+                    values[el.jurisdiction_of_occurrence] = values[el.jurisdiction_of_occurrence] || {}
+                    values[el.jurisdiction_of_occurrence][el.mmwryear] = values[el.jurisdiction_of_occurrence][el.mmwryear] || {}
+                    values[el.jurisdiction_of_occurrence][el.mmwryear]['total'] = values[el.jurisdiction_of_occurrence][el.mmwryear]['total'] || {}
+                    values[el.jurisdiction_of_occurrence][el.mmwryear]['total'][el.mmwrweek] = values[el.jurisdiction_of_occurrence][el.mmwryear]['total'][el.mmwrweek] || 0
+                    values[el.jurisdiction_of_occurrence][el.mmwryear]['total'][el.mmwrweek] += parseInt(el.all_cause)
+
+                    values[el.jurisdiction_of_occurrence][el.mmwryear]['covid'] = values[el.jurisdiction_of_occurrence][el.mmwryear]['covid'] || {}
+                    values[el.jurisdiction_of_occurrence][el.mmwryear]['covid'][el.mmwrweek] = values[el.jurisdiction_of_occurrence][el.mmwryear]['covid'][el.mmwrweek] || 0
+                    values[el.jurisdiction_of_occurrence][el.mmwryear]['covid'][el.mmwrweek] += parseInt(el.covid_19_u071_underlying_cause_of_death)
+                })
+    
+                return values
+            }
+            
+            var values = mapData()
+
+            document.getElementById('total2019').innerHTML = Object.values(values['United States']['2019']['total']).reduce((a, b) => a + b, 0).toLocaleString()
+            document.getElementById('total2020').innerHTML =  Object.values(values['United States']['2020']['total']).reduce((a, b) => a + b, 0).toLocaleString()
+            document.getElementById('covid2020').innerHTML =  Object.values(values['United States']['2020']['covid']).reduce((a, b) => a + b, 0).toLocaleString()
+
+            var canvas = document.createElement("canvas");
+            canvas.id = 'graphs'
+            canvas.height = '250'
+            document.getElementById('graphs').appendChild(canvas)
+
+            var ctx =  canvas.getContext('2d')
+
+            var myChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: [...Array(52).keys()],
+                    datasets: [
+                        {
+                            label: 'Deaths (2019)',
+                            data: Object.values(values['United States']['2019']['total']),
+                            borderColor: 'blue'
+                        },
+                        {
+                            label: 'Deaths (2020)',
+                            data: Object.values(values['United States']['2020']['total']),
+                            borderColor: 'red'
+                        },
+                        {
+                            label: 'Underlying COVID-19 Deaths (2020)',
+                            data: Object.values(values['United States']['2020']['covid']),
+                            borderColor: 'green'
+                        }
+                    ]
+                },
+                options: {
+                    scales: {
+                        yAxes: [{
+                            ticks: {
+                                beginAtZero: true
+                            }
+                        }]
+                    },
+                    title: {
+                        display: true,
+                        text: 'Deaths in the United States by Week'
+                    }
+                }
+            })
+
+        </script>
+    </body>
+</html>
