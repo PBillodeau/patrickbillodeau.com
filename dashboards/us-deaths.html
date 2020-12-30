@@ -2,7 +2,7 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Weekly Deaths in the United States</title>
+        <title>United States Deaths</title>
         <link rel="preconnect" href="https://fonts.gstatic.com">
         <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet"> 
         <style>
@@ -11,36 +11,191 @@
                 font-size: 1.25rem;
                 background-color: #fff;
             }
+
+            #app {
+                padding: 0 1rem; 
+                max-width: 1400px; 
+                margin: auto;
+            }
+
+            .causes > div {
+                width: 300px;
+                font-size: 0.8rem;
+                padding: 10px 0;
+                cursor: pointer;
+            }
+
+            .causes label {
+                cursor: pointer;
+                padding-left: 5px;
+            }
+
+            .causes {
+                display: flex;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .summary {
+                text-align: center; 
+                border: 1px solid #333; 
+                background-color: #efefef;
+            }
+
+            .summary span {
+                font-weight: bold;
+            }
+
+            .summary > div {
+                padding: 10px 0;
+            }
+
+            .container {
+                margin: 40px 0;
+            }
+
+            @media only screen and (min-width: 1000px) {
+                .container {
+                    display: flex;
+                    flex-wrap: wrap;
+                }
+
+                .container > .controls {
+                    width: 20%;
+                    padding-left: 5%;
+                    order: 2;
+                }
+
+                .container > #graphs {
+                    width: 75%;
+                    order: 1;
+                }
+            }
         </style>
     </head>
     <body>
-        <div id="app" style="margin: 0 1rem;">
-            
-            <div id="graphs" style="width: 95%; max-width: 1000px; margin: auto;"></div>
-            <div style='text-align: center; border: 1px solid #333; width: 95%; max-width: 1000px; margin: 20px auto; background-color: #efefef;'>
-                <div style="padding: 10px 0;">Total Deaths (2019): <span id='total2019' style='font-weight: bold;'></span></div>
-                <div style="padding: 10px 0;">Total Deaths (2020) (incomplete): <span id='total2020' style='font-weight: bold;'></span></div>
-                <div style="padding: 10px 0;">Underlying COVID-19 Deaths (2020): <span id='covid2020' style='font-weight: bold;'></span></div>
+        <div id="app">
+            <div class='container'>
+                <div class='controls'>
+                    <h3>State</h3>
+                    <select name="state" id="state" onchange="update()" style="width: 100%; height: 40px;">
+                        <option value='United States' selected>All</option>
+                        <option value='Alabama'>Alabama</option>
+                        <option value='Alaska'>Alaska</option>
+                        <option value='Arizona'>Arizona</option>
+                        <option value='Arkansas'>Arkansas</option>
+                        <option value='California'>California</option>
+                        <option value='Colorado'>Colorado</option>
+                        <option value='Connecticut'>Connecticut</option>
+                        <option value='Delaware'>Delaware</option>
+                        <option value='Florida'>Florida</option>
+                        <option value='Georgia'>Georgia</option>
+                        <option value='Hawaii'>Hawaii</option>
+                        <option value='Idaho'>Idaho</option>
+                        <option value='Illinois'>Illinois</option>
+                        <option value='Indiana'>Indiana</option>
+                        <option value='Iowa'>Iowa</option>
+                        <option value='Kansas'>Kansas</option>
+                        <option value='Kentucky'>Kentucky</option>
+                        <option value='Louisiana'>Louisiana</option>
+                        <option value='Maine'>Maine</option>
+                        <option value='Maryland'>Maryland</option>
+                        <option value='Massachusetts'>Massachusetts</option>
+                        <option value='Michigan'>Michigan</option>
+                        <option value='Minnesota'>Minnesota</option>
+                        <option value='Mississippi'>Mississippi</option>
+                        <option value='Missouri'>Missouri</option>
+                        <option value='Montana'>Montana</option>
+                        <option value='Nebraska'>Nebraska</option>
+                        <option value='Nevada'>Nevada</option>
+                        <option value='New Hampshire'>New Hampshire</option>
+                        <option value='New Jersey'>New Jersey</option>
+                        <option value='New Mexico'>New Mexico</option>
+                        <option value='New York'>New York</option>
+                        <option value='North Carolina'>North Carolina</option>
+                        <option value='North Dakota'>North Dakota</option>
+                        <option value='Ohio'>Ohio</option>
+                        <option value='Oklahoma'>Oklahoma</option>
+                        <option value='Oregon'>Oregon</option>
+                        <option value='Pennsylvania'>Pennsylvania</option>
+                        <option value='Rhode Island'>Rhode Island</option>
+                        <option value='South Carolina'>South Carolina</option>
+                        <option value='South Dakota'>South Dakota</option>
+                        <option value='Tennessee'>Tennessee</option>
+                        <option value='Texas'>Texas</option>
+                        <option value='Utah'>Utah</option>
+                        <option value='Vermont'>Vermont</option>
+                        <option value='Virginia'>Virginia</option>
+                        <option value='Washington'>Washington</option>
+                        <option value='West Virginia'>West Virginia</option>
+                        <option value='Wisconsin'>Wisconsin</option>
+                        <option value='Wyoming'>Wyoming</option>
+                    </select>
+
+                    <h3>Causes</h3>
+                    <div class='causes'>
+                        <div><input onclick="update();" type='checkbox' name='all_cause' id='all_cause' checked><label for='all_cause'>All causes</label></div>
+                        <div><input onclick="update();" type='checkbox' name='natural_cause' id='natural_cause'><label for='natural_cause'>Natural causes</label></div>
+                        <div><input onclick="update();" type='checkbox' name='septicemia_a40_a41' id='septicemia_a40_a41'><label for='septicemia_a40_a41'>Septicemia</label></div>
+                        <div><input onclick="update();" type='checkbox' name='malignant_neoplasms_c00_c97' id='malignant_neoplasms_c00_c97'><label for='malignant_neoplasms_c00_c97'>Malignant Neoplasms</label></div>
+                        <div><input onclick="update();" type='checkbox' name='diabetes_mellitus_e10_e14' id='diabetes_mellitus_e10_e14'><label for='diabetes_mellitus_e10_e14'>Diabetes</label></div>
+                        <div><input onclick="update();" type='checkbox' name='alzheimer_disease_g30' id='alzheimer_disease_g30'><label for='alzheimer_disease_g30'>Alzheimer Disease</label></div>
+                        <div><input onclick="update();" type='checkbox' name='influenza_and_pneumonia_j09_j18' id='influenza_and_pneumonia_j09_j18'><label for='influenza_and_pneumonia_j09_j18'>Influenza and Pneumonia</label></div>
+                        <div><input onclick="update();" type='checkbox' name='chronic_lower_respiratory' id='chronic_lower_respiratory'><label for='chronic_lower_respiratory'>Chronic Lower Respiratory</label></div>
+                        <div><input onclick="update();" type='checkbox' name='other_diseases_of_respiratory' id='other_diseases_of_respiratory'><label for='other_diseases_of_respiratory'>Other Diseases of Respiratory</label></div>
+                        <div><input onclick="update();" type='checkbox' name='nephritis_nephrotic_syndrome' id='nephritis_nephrotic_syndrome'><label for='nephritis_nephrotic_syndrome'>Nephritis Nephrotic Syndrome</label></div>
+                        <div><input onclick="update();" type='checkbox' name='symptoms_signs_and_abnormal' id='symptoms_signs_and_abnormal'><label for='symptoms_signs_and_abnormal'>Symptom Signs and Abnormal</label></div>
+                        <div><input onclick="update();" type='checkbox' name='diseases_of_heart_i00_i09' id='diseases_of_heart_i00_i09'><label for='diseases_of_heart_i00_i09'>Diseases of Heart</label></div>
+                        <div><input onclick="update();" type='checkbox' name='cerebrovascular_diseases' id='cerebrovascular_diseases'><label for='cerebrovascular_diseases'>Cerebrovascular Diseases</label></div>
+                        <div><input onclick="update();" type='checkbox' name='covid_19_u071_multiple_cause_of_death' id='covid_19_u071_multiple_cause_of_death'><label for='covid_19_u071_multiple_cause_of_death'>COVID-19 Multiple</label></div>
+                        <div><input onclick="update();" type='checkbox' name='covid_19_u071_underlying_cause_of_death' id='covid_19_u071_underlying_cause_of_death' checked><label for='covid_19_u071_underlying_cause_of_death'>Underlying COVID-19</label></div>
+                    </div>
+                </div>
+    
+                <div id="graphs"></div>
+            </div>
+
+            <div class='summary'>
+                <div>Total Deaths (2019): <span id='total2019'></span></div>
+                <div>Total Deaths (2020) (incomplete): <span id='total2020'></span></div>
+                <div>Underlying COVID-19 Deaths (2020): <span id='covid2020'></span></div>
             </div>
             
             <p style="width: 100%; text-align: center;">Source: <a href="https://data.cdc.gov/NCHS/Weekly-Counts-of-Deaths-by-State-and-Select-Causes/muzy-jte6">https://data.cdc.gov/NCHS/Weekly-Counts-of-Deaths-by-State-and-Select-Causes/muzy-jte6</a></p> 
+            <p style="width: 100%; text-align: center;">Last updated 12/29/20</p>
         </div>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.min.js"></script>
         <script src="./death-data.js"></script>
         <script>
             function mapData() {      
                 var values = {}
+                var categories = [
+                    'all_cause', 
+                    'natural_cause',
+                    'septicemia_a40_a41',
+                    'malignant_neoplasms_c00_c97',
+                    'diabetes_mellitus_e10_e14',
+                    'alzheimer_disease_g30',
+                    'influenza_and_pneumonia_j09_j18',
+                    'chronic_lower_respiratory',
+                    'other_diseases_of_respiratory',
+                    'nephritis_nephrotic_syndrome',
+                    'symptoms_signs_and_abnormal',
+                    'diseases_of_heart_i00_i09',
+                    'cerebrovascular_diseases',
+                    'covid_19_u071_multiple_cause_of_death',
+                    'covid_19_u071_underlying_cause_of_death'
+                ]
 
-                data.forEach(el =>{
+                data.forEach(el => {
                     values[el.jurisdiction_of_occurrence] = values[el.jurisdiction_of_occurrence] || {}
                     values[el.jurisdiction_of_occurrence][el.mmwryear] = values[el.jurisdiction_of_occurrence][el.mmwryear] || {}
-                    values[el.jurisdiction_of_occurrence][el.mmwryear]['total'] = values[el.jurisdiction_of_occurrence][el.mmwryear]['total'] || {}
-                    values[el.jurisdiction_of_occurrence][el.mmwryear]['total'][el.mmwrweek] = values[el.jurisdiction_of_occurrence][el.mmwryear]['total'][el.mmwrweek] || 0
-                    values[el.jurisdiction_of_occurrence][el.mmwryear]['total'][el.mmwrweek] += parseInt(el.all_cause)
 
-                    values[el.jurisdiction_of_occurrence][el.mmwryear]['covid'] = values[el.jurisdiction_of_occurrence][el.mmwryear]['covid'] || {}
-                    values[el.jurisdiction_of_occurrence][el.mmwryear]['covid'][el.mmwrweek] = values[el.jurisdiction_of_occurrence][el.mmwryear]['covid'][el.mmwrweek] || 0
-                    values[el.jurisdiction_of_occurrence][el.mmwryear]['covid'][el.mmwrweek] += parseInt(el.covid_19_u071_underlying_cause_of_death)
+                    categories.forEach(cat => {
+                        values[el.jurisdiction_of_occurrence][el.mmwryear][cat] = values[el.jurisdiction_of_occurrence][el.mmwryear][cat] || {}
+                        values[el.jurisdiction_of_occurrence][el.mmwryear][cat][el.mmwrweek] = values[el.jurisdiction_of_occurrence][el.mmwryear][cat][el.mmwrweek] || 0
+                        values[el.jurisdiction_of_occurrence][el.mmwryear][cat][el.mmwrweek] += parseInt(el[cat])
+                    })
                 })
     
                 return values
@@ -48,12 +203,12 @@
             
             var values = mapData()
 
-            document.getElementById('total2019').innerHTML = Object.values(values['United States']['2019']['total']).reduce((a, b) => a + b, 0).toLocaleString()
-            document.getElementById('total2020').innerHTML =  Object.values(values['United States']['2020']['total']).reduce((a, b) => a + b, 0).toLocaleString()
-            document.getElementById('covid2020').innerHTML =  Object.values(values['United States']['2020']['covid']).reduce((a, b) => a + b, 0).toLocaleString()
+            document.getElementById('total2019').innerHTML = Object.values(values['United States']['2019']['all_cause']).reduce((a, b) => a + b, 0).toLocaleString()
+            document.getElementById('total2020').innerHTML =  Object.values(values['United States']['2020']['all_cause']).reduce((a, b) => a + b, 0).toLocaleString()
+            document.getElementById('covid2020').innerHTML =  Object.values(values['United States']['2020']['covid_19_u071_underlying_cause_of_death']).reduce((a, b) => a + b, 0).toLocaleString()
 
             var canvas = document.createElement("canvas");
-            canvas.id = 'graphs'
+            canvas.id = 'graph'
             canvas.height = '250'
             document.getElementById('graphs').appendChild(canvas)
 
@@ -63,23 +218,7 @@
                 type: 'line',
                 data: {
                     labels: [...Array(52).keys()],
-                    datasets: [
-                        {
-                            label: 'Deaths (2019)',
-                            data: Object.values(values['United States']['2019']['total']),
-                            borderColor: 'blue'
-                        },
-                        {
-                            label: 'Deaths (2020)',
-                            data: Object.values(values['United States']['2020']['total']),
-                            borderColor: 'red'
-                        },
-                        {
-                            label: 'Underlying COVID-19 Deaths (2020)',
-                            data: Object.values(values['United States']['2020']['covid']),
-                            borderColor: 'green'
-                        }
-                    ]
+                    datasets: []
                 },
                 options: {
                     scales: {
@@ -91,10 +230,195 @@
                     },
                     title: {
                         display: true,
+                        fontSize: '32',
+                        fontColor: '#333',
                         text: 'Deaths in the United States by Week'
                     }
                 }
             })
+
+            function update() {
+
+                function datasets(group) {
+                    return [
+                        {
+                            label: 'All Causes (2019)',
+                            data: Object.values(values[group]['2019']['all_cause']),
+                            borderColor: 'blue',
+                            show: document.getElementById('all_cause').checked
+                        },
+                        {
+                            label: 'All Causes (2020)',
+                            data: Object.values(values[group]['2020']['all_cause']),
+                            borderColor: 'red',
+                            show: document.getElementById('all_cause').checked
+                        },
+                        {
+                            label: 'Natural Causes (2019)',
+                            data: Object.values(values[group]['2019']['natural_cause']),
+                            borderColor: 'blue',
+                            show: document.getElementById('natural_cause').checked
+                        },
+                        {
+                            label: 'Natural Causes (2020)',
+                            data: Object.values(values[group]['2020']['natural_cause']),
+                            borderColor: 'red',
+                            show: document.getElementById('natural_cause').checked
+                        },
+                        {
+                            label: 'Septicemia (2019)',
+                            data: Object.values(values[group]['2019']['septicemia_a40_a41']),
+                            borderColor: 'blue',
+                            show: document.getElementById('septicemia_a40_a41').checked
+                        },
+                        {
+                            label: 'Septicemia (2020)',
+                            data: Object.values(values[group]['2020']['septicemia_a40_a41']),
+                            borderColor: 'red',
+                            show: document.getElementById('septicemia_a40_a41').checked
+                        },
+                        {
+                            label: 'Malignant Neoplasms (2019)',
+                            data: Object.values(values[group]['2019']['malignant_neoplasms_c00_c97']),
+                            borderColor: 'blue',
+                            show: document.getElementById('malignant_neoplasms_c00_c97').checked
+                        },
+                        {
+                            label: 'Malignant Neoplasms (2020)',
+                            data: Object.values(values[group]['2020']['malignant_neoplasms_c00_c97']),
+                            borderColor: 'red',
+                            show: document.getElementById('malignant_neoplasms_c00_c97').checked
+                        },
+                        {
+                            label: 'Diabetes (2019)',
+                            data: Object.values(values[group]['2019']['diabetes_mellitus_e10_e14']),
+                            borderColor: 'blue',
+                            show: document.getElementById('diabetes_mellitus_e10_e14').checked
+                        },
+                        {
+                            label: 'Diabetes (2020)',
+                            data: Object.values(values[group]['2020']['diabetes_mellitus_e10_e14']),
+                            borderColor: 'red',
+                            show: document.getElementById('diabetes_mellitus_e10_e14').checked
+                        },
+                        {
+                            label: 'Alzheimer Disease (2019)',
+                            data: Object.values(values[group]['2019']['alzheimer_disease_g30']),
+                            borderColor: 'blue',
+                            show: document.getElementById('alzheimer_disease_g30').checked
+                        },
+                        {
+                            label: 'Alzheimer Disease (2020)',
+                            data: Object.values(values[group]['2020']['alzheimer_disease_g30']),
+                            borderColor: 'red',
+                            show: document.getElementById('alzheimer_disease_g30').checked
+                        },
+                        {
+                            label: 'Influenza and Pneumonia (2019)',
+                            data: Object.values(values[group]['2019']['influenza_and_pneumonia_j09_j18']),
+                            borderColor: 'blue',
+                            show: document.getElementById('influenza_and_pneumonia_j09_j18').checked
+                        },
+                        {
+                            label: 'Influenza and Pneumonia (2020)',
+                            data: Object.values(values[group]['2020']['influenza_and_pneumonia_j09_j18']),
+                            borderColor: 'red',
+                            show: document.getElementById('influenza_and_pneumonia_j09_j18').checked
+                        },
+                        {
+                            label: 'Chronic Lower Respiratory (2019)',
+                            data: Object.values(values[group]['2019']['chronic_lower_respiratory']),
+                            borderColor: 'blue',
+                            show: document.getElementById('chronic_lower_respiratory').checked
+                        },
+                        {
+                            label: 'Chronic Lower Respiratory (2020)',
+                            data: Object.values(values[group]['2020']['chronic_lower_respiratory']),
+                            borderColor: 'red',
+                            show: document.getElementById('chronic_lower_respiratory').checked
+                        },
+                        {
+                            label: 'Other Diseases of Respiratory (2019)',
+                            data: Object.values(values[group]['2019']['other_diseases_of_respiratory']),
+                            borderColor: 'blue',
+                            show: document.getElementById('other_diseases_of_respiratory').checked
+                        },
+                        {
+                            label: 'Other Diseases of Respiratory (2020)',
+                            data: Object.values(values[group]['2020']['other_diseases_of_respiratory']),
+                            borderColor: 'red',
+                            show: document.getElementById('other_diseases_of_respiratory').checked
+                        },
+                        {
+                            label: 'Nephritis Nephrotic Syndrome (2019)',
+                            data: Object.values(values[group]['2019']['nephritis_nephrotic_syndrome']),
+                            borderColor: 'blue',
+                            show: document.getElementById('nephritis_nephrotic_syndrome').checked
+                        },
+                        {
+                            label: 'Nephritis Nephrotic Syndrome (2020)',
+                            data: Object.values(values[group]['2020']['nephritis_nephrotic_syndrome']),
+                            borderColor: 'red',
+                            show: document.getElementById('nephritis_nephrotic_syndrome').checked
+                        },
+                        {
+                            label: 'Symptoms Signs and Abnormal (2019)',
+                            data: Object.values(values[group]['2019']['symptoms_signs_and_abnormal']),
+                            borderColor: 'blue',
+                            show: document.getElementById('symptoms_signs_and_abnormal').checked
+                        },
+                        {
+                            label: 'Symptoms Signs and Abnormal (2020)',
+                            data: Object.values(values[group]['2020']['symptoms_signs_and_abnormal']),
+                            borderColor: 'red',
+                            show: document.getElementById('symptoms_signs_and_abnormal').checked
+                        },
+                        {
+                            label: 'Diseases of Heart (2019)',
+                            data: Object.values(values[group]['2019']['diseases_of_heart_i00_i09']),
+                            borderColor: 'blue',
+                            show: document.getElementById('diseases_of_heart_i00_i09').checked
+                        },
+                        {
+                            label: 'Diseases of Heart (2020)',
+                            data: Object.values(values[group]['2020']['diseases_of_heart_i00_i09']),
+                            borderColor: 'red',
+                            show: document.getElementById('diseases_of_heart_i00_i09').checked
+                        },
+                        {
+                            label: 'Cerebrovascular Diseases (2019)',
+                            data: Object.values(values[group]['2019']['cerebrovascular_diseases']),
+                            borderColor: 'blue',
+                            show: document.getElementById('cerebrovascular_diseases').checked
+                        },
+                        {
+                            label: 'Cerebrovascular Diseases (2020)',
+                            data: Object.values(values[group]['2020']['cerebrovascular_diseases']),
+                            borderColor: 'red',
+                            show: document.getElementById('cerebrovascular_diseases').checked
+                        },
+                        {
+                            label: 'COVID-19 Multiple Cause of Death (2020)',
+                            data: Object.values(values[group]['2020']['covid_19_u071_multiple_cause_of_death']),
+                            borderColor: 'purple',
+                            show: document.getElementById('covid_19_u071_multiple_cause_of_death').checked
+                        },
+                        {
+                            label: 'COVID-19 Underlying Cause of Death (2020)',
+                            data: Object.values(values[group]['2020']['covid_19_u071_underlying_cause_of_death']),
+                            borderColor: 'green',
+                            show: document.getElementById('covid_19_u071_underlying_cause_of_death').checked
+                        }
+                    ]
+                }
+
+                myChart.data.datasets = datasets(document.getElementById('state').value).filter(set => set.show)
+                myChart.options.title.text = `Deaths in ${document.getElementById('state').value} by Week`
+
+                myChart.update();
+            }
+            
+            update()
 
         </script>
     </body>
