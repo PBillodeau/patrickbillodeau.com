@@ -3,172 +3,64 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>United States Deaths</title>
+        <link rel="stylesheet" href="shared/styles.css" type="text/css">
         <link rel="preconnect" href="https://fonts.gstatic.com">
-        <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet"> 
-        <style>
-            html {
-                font-family: 'Montserrat', sans-serif;
-                font-size: 1.25rem;
-                background-color: #fff;
-            }
-
-            #app {
-                padding: 0 1rem; 
-                max-width: 1400px; 
-                margin: auto;
-            }
-
-            .causes > div {
-                width: 300px;
-                font-size: 0.8rem;
-                padding: 10px 0;
-                cursor: pointer;
-            }
-
-            .causes label {
-                cursor: pointer;
-                padding-left: 5px;
-            }
-
-            .causes {
-                display: flex;
-                flex-wrap: wrap;
-                justify-content: center;
-            }
-
-            .summary {
-                text-align: center; 
-                border: 1px solid #333; 
-                background-color: #efefef;
-            }
-
-            .disclaimer {
-                text-align: center;
-                font-size: 0.8rem;
-                font-style: italic;
-                margin: 20px 0;
-            }
-
-            .summary span {
-                font-weight: bold;
-            }
-
-            .summary > div {
-                padding: 10px 0;
-            }
-
-            .container {
-                margin: 40px 0;
-            }
-
-            #state {
-                width: 100%; 
-                height: 40px;
-            }
-
-            @media only screen and (min-width: 1000px) {
-                .container {
-                    display: flex;
-                    flex-wrap: wrap;
-                }
-
-                .container > .controls {
-                    width: 20%;
-                    padding-left: 5%;
-                    order: 2;
-                }
-
-                .container > #graphs {
-                    width: 75%;
-                    order: 1;
-                }
-            }
-        </style>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400;0,700;1,400&display=swap"> 
+        <script src='./shared/Controls.js'></script>
         <script>
             class Dashboard {
-                constructor(data) {
-                    this.categories = {
-                        'all_cause': 'All causes', 
-                        'natural_cause': 'Natural causes',
-                        'septicemia_a40_a41': 'Septicemia',
-                        'malignant_neoplasms_c00_c97': 'Malignant Neoplasms',
-                        'diabetes_mellitus_e10_e14': 'Diabetes',
-                        'alzheimer_disease_g30': 'Alzheimer Disease',
-                        'influenza_and_pneumonia_j09_j18': 'Influenza and Pneumonia',
-                        'chronic_lower_respiratory': 'Chronic Lower Respiratory',
-                        'other_diseases_of_respiratory': 'Other Diseases of Respiratory',
-                        'nephritis_nephrotic_syndrome': 'Nephritis Nephrotic Syndrome',
-                        'symptoms_signs_and_abnormal': 'Symptom Signs and Abnormal',
-                        'diseases_of_heart_i00_i09': 'Diseases of Heart',
-                        'cerebrovascular_diseases': 'Cerebrovascular Diseases',
-                        'covid_19_u071_multiple_cause_of_death': 'COVID-19 Multiple',
-                        'covid_19_u071_underlying_cause_of_death': 'Underlying COVID-19'
+                constructor(chartConfigs, data, id) {
+                    this.chartOptions = {
+                        scales: {
+                            yAxes: [{
+                                ticks: {
+                                    beginAtZero: true
+                                }
+                            }]
+                        },
+                        title: {
+                            display: true,
+                            fontSize: '32',
+                            fontColor: '#333'
+                        }
                     }
-
-                    this.mappedData = {}
-                    this.chart = null
+                    this.chartConfigs = chartConfigs
                     this.data = data
+                    this.charts = []
+                    this.id = id
 
-                    this.mapData()
                     this.createChart()
-                    this.createSummary()
-                    this.update()
-                }
-
-                mapData() {      
-                    this.data.forEach(el => {
-                        Object.keys(this.categories).forEach(cat => {
-                            this.mappedData[el.jurisdiction_of_occurrence] = this.mappedData[el.jurisdiction_of_occurrence] || {}
-                            this.mappedData[el.jurisdiction_of_occurrence][el.mmwryear] = this.mappedData[el.jurisdiction_of_occurrence][el.mmwryear] || {}
-                            this.mappedData[el.jurisdiction_of_occurrence][el.mmwryear][cat] = this.mappedData[el.jurisdiction_of_occurrence][el.mmwryear][cat] || {
-                                label: `${this.categories[cat]} (${el.mmwryear})`,
-                                borderColor: el.mmwryear === '2020' ? 'red' : 'blue',
-                                id: cat
-                            }
-                            this.mappedData[el.jurisdiction_of_occurrence][el.mmwryear][cat].data = this.mappedData[el.jurisdiction_of_occurrence][el.mmwryear][cat].data || []
-                            this.mappedData[el.jurisdiction_of_occurrence][el.mmwryear][cat].data.push(parseInt(el[cat]))
-                        })
-                    })
                 }
 
                 createChart() {
-                    var ctx =  document.getElementById('graph').getContext('2d')
-                    this.chart = new Chart(ctx, {
-                        type: 'line',
-                        data: {
-                            labels: [...Array(52).keys()],
-                            datasets: []
-                        },
-                        options: {
-                            scales: {
-                                yAxes: [{
-                                    ticks: {
-                                        beginAtZero: true
-                                    }
-                                }]
-                            },
-                            title: {
-                                display: true,
-                                fontSize: '32',
-                                fontColor: '#333'
-                            }
-                        }
-                    })
-                }
-
-                createSummary() {
-                    document.getElementById('total2019').innerHTML = this.mappedData['United States']['2019']['all_cause'].data.reduce((a, b) => a + b, 0).toLocaleString()
-                    document.getElementById('total2020').innerHTML = this.mappedData['United States']['2020']['all_cause'].data.reduce((a, b) => a + b, 0).toLocaleString()
-                    document.getElementById('covid2020').innerHTML = this.mappedData['United States']['2020']['covid_19_u071_underlying_cause_of_death'].data.reduce((a, b) => a + b, 0).toLocaleString()
+                    var graphs = document.getElementById(this.id)
+                    
+                    this.chartConfigs.forEach(chart => {
+                        var canvas = document.createElement('canvas')
+                        canvas.id = chart.id
+                        canvas.height = 250 / this.chartConfigs.length
+                        graphs.appendChild(canvas)
+                        
+                        this.charts.push(new Chart(canvas.getContext('2d'), {
+                            type: chart.type,
+                            data: {},
+                            options: this.chartOptions
+                        }))
+                    })                    
                 }
 
                 update() {
                     var state = document.getElementById('state').value
-                    var datasets = Object.values(this.mappedData[state]['2019']).concat(Object.values(this.mappedData[state]['2020']))
+                    var datasets = Object.values(this.data[state]['2019']).concat(Object.values(this.data[state]['2020']))
 
-                    this.chart.data.datasets = datasets.filter(set => document.getElementById(set.id).checked)
-                    this.chart.options.title.text = `Deaths in ${state} by Week`
-                    this.chart.update();
+                    this.chartConfigs.forEach((config, i) => {
+                        this.charts[i].data = {
+                            labels: [...datasets[0].data.keys()],
+                            datasets: datasets.filter(set => document.getElementById(set.id).checked)
+                        }
+                        this.charts[i].options.title.text = `Deaths in ${state} by Week`
+                        this.charts[i].update();
+                    })
                 }
             }
         </script>
@@ -176,130 +68,8 @@
     <body>
         <div id="app">
             <div class='container'>
-                <div class='controls'>
-                    <h3>State</h3>
-                    <select name="state" id="state" onchange="dashboard.update()">
-                        <option value='United States' selected>All</option>
-                        <option value='Alabama'>Alabama</option>
-                        <option value='Alaska'>Alaska</option>
-                        <option value='Arizona'>Arizona</option>
-                        <option value='Arkansas'>Arkansas</option>
-                        <option value='California'>California</option>
-                        <option value='Colorado'>Colorado</option>
-                        <option value='Connecticut'>Connecticut</option>
-                        <option value='Delaware'>Delaware</option>
-                        <option value='Florida'>Florida</option>
-                        <option value='Georgia'>Georgia</option>
-                        <option value='Hawaii'>Hawaii</option>
-                        <option value='Idaho'>Idaho</option>
-                        <option value='Illinois'>Illinois</option>
-                        <option value='Indiana'>Indiana</option>
-                        <option value='Iowa'>Iowa</option>
-                        <option value='Kansas'>Kansas</option>
-                        <option value='Kentucky'>Kentucky</option>
-                        <option value='Louisiana'>Louisiana</option>
-                        <option value='Maine'>Maine</option>
-                        <option value='Maryland'>Maryland</option>
-                        <option value='Massachusetts'>Massachusetts</option>
-                        <option value='Michigan'>Michigan</option>
-                        <option value='Minnesota'>Minnesota</option>
-                        <option value='Mississippi'>Mississippi</option>
-                        <option value='Missouri'>Missouri</option>
-                        <option value='Montana'>Montana</option>
-                        <option value='Nebraska'>Nebraska</option>
-                        <option value='Nevada'>Nevada</option>
-                        <option value='New Hampshire'>New Hampshire</option>
-                        <option value='New Jersey'>New Jersey</option>
-                        <option value='New Mexico'>New Mexico</option>
-                        <option value='New York'>New York</option>
-                        <option value='North Carolina'>North Carolina</option>
-                        <option value='North Dakota'>North Dakota</option>
-                        <option value='Ohio'>Ohio</option>
-                        <option value='Oklahoma'>Oklahoma</option>
-                        <option value='Oregon'>Oregon</option>
-                        <option value='Pennsylvania'>Pennsylvania</option>
-                        <option value='Rhode Island'>Rhode Island</option>
-                        <option value='South Carolina'>South Carolina</option>
-                        <option value='South Dakota'>South Dakota</option>
-                        <option value='Tennessee'>Tennessee</option>
-                        <option value='Texas'>Texas</option>
-                        <option value='Utah'>Utah</option>
-                        <option value='Vermont'>Vermont</option>
-                        <option value='Virginia'>Virginia</option>
-                        <option value='Washington'>Washington</option>
-                        <option value='West Virginia'>West Virginia</option>
-                        <option value='Wisconsin'>Wisconsin</option>
-                        <option value='Wyoming'>Wyoming</option>
-                    </select>
-
-                    <h3>Causes</h3>
-                    <div class='causes'>
-                        <div>
-                            <input onclick="dashboard.update();" type='checkbox' name='all_cause' id='all_cause' checked>
-                            <label for='all_cause'>All causes</label>
-                        </div>
-                        <div>
-                            <input onclick="dashboard.update();" type='checkbox' name='natural_cause' id='natural_cause'>
-                            <label for='natural_cause'>Natural causes</label>
-                        </div>
-                        <div>
-                            <input onclick="dashboard.update();" type='checkbox' name='septicemia_a40_a41' id='septicemia_a40_a41'>
-                            <label for='septicemia_a40_a41'>Septicemia</label>
-                        </div>
-                        <div>
-                            <input onclick="dashboard.update();" type='checkbox' name='malignant_neoplasms_c00_c97' id='malignant_neoplasms_c00_c97'>
-                            <label for='malignant_neoplasms_c00_c97'>Malignant Neoplasms</label>
-                        </div>
-                        <div>
-                            <input onclick="dashboard.update();" type='checkbox' name='diabetes_mellitus_e10_e14' id='diabetes_mellitus_e10_e14'>
-                            <label for='diabetes_mellitus_e10_e14'>Diabetes</label>
-                        </div>
-                        <div>
-                            <input onclick="dashboard.update();" type='checkbox' name='alzheimer_disease_g30' id='alzheimer_disease_g30'>
-                            <label for='alzheimer_disease_g30'>Alzheimer Disease</label>
-                        </div>
-                        <div>
-                            <input onclick="dashboard.update();" type='checkbox' name='influenza_and_pneumonia_j09_j18' id='influenza_and_pneumonia_j09_j18'>
-                            <label for='influenza_and_pneumonia_j09_j18'>Influenza and Pneumonia</label>
-                        </div>
-                        <div>
-                            <input onclick="dashboard.update();" type='checkbox' name='chronic_lower_respiratory' id='chronic_lower_respiratory'>
-                            <label for='chronic_lower_respiratory'>Chronic Lower Respiratory</label>
-                        </div>
-                        <div>
-                            <input onclick="dashboard.update();" type='checkbox' name='other_diseases_of_respiratory' id='other_diseases_of_respiratory'>
-                            <label for='other_diseases_of_respiratory'>Other Diseases of Respiratory</label>
-                        </div>
-                        <div>
-                            <input onclick="dashboard.update();" type='checkbox' name='nephritis_nephrotic_syndrome' id='nephritis_nephrotic_syndrome'>
-                            <label for='nephritis_nephrotic_syndrome'>Nephritis Nephrotic Syndrome</label>
-                        </div>
-                        <div>
-                            <input onclick="dashboard.update();" type='checkbox' name='symptoms_signs_and_abnormal' id='symptoms_signs_and_abnormal'>
-                            <label for='symptoms_signs_and_abnormal'>Symptom Signs and Abnormal</label>
-                        </div>
-                        <div>
-                            <input onclick="dashboard.update();" type='checkbox' name='diseases_of_heart_i00_i09' id='diseases_of_heart_i00_i09'>
-                            <label for='diseases_of_heart_i00_i09'>Diseases of Heart</label>
-                        </div>
-                        <div>
-                            <input onclick="dashboard.update();" type='checkbox' name='cerebrovascular_diseases' id='cerebrovascular_diseases'>
-                            <label for='cerebrovascular_diseases'>Cerebrovascular Diseases</label>
-                        </div>
-                        <div>
-                            <input onclick="dashboard.update();" type='checkbox' name='covid_19_u071_multiple_cause_of_death' id='covid_19_u071_multiple_cause_of_death'>
-                            <label for='covid_19_u071_multiple_cause_of_death'>COVID-19 Multiple</label>
-                        </div>
-                        <div>
-                            <input onclick="dashboard.update();" type='checkbox' name='covid_19_u071_underlying_cause_of_death' id='covid_19_u071_underlying_cause_of_death' checked>
-                            <label for='covid_19_u071_underlying_cause_of_death'>Underlying COVID-19</label>
-                        </div>
-                    </div>
-                </div>
-
-                <div id="graphs">
-                    <canvas id='graph' height=250></canvas>
-                </div>
+                <div id='controls'></div>
+                <div id="graphs"></div>
             </div>
 
             <div class='summary'>
@@ -316,7 +86,130 @@
         <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.min.js"></script>
         <script src="./death-data.js"></script>
         <script>
-            var dashboard = new Dashboard(data)
+            class Summary {
+                createSummary(data) {
+                    document.getElementById('total2019').innerHTML = data['United States']['2019']['all_cause'].data.reduce((a, b) => a + b, 0).toLocaleString()
+                    document.getElementById('total2020').innerHTML = data['United States']['2020']['all_cause'].data.reduce((a, b) => a + b, 0).toLocaleString()
+                    document.getElementById('covid2020').innerHTML = data['United States']['2020']['covid_19_u071_underlying_cause_of_death'].data.reduce((a, b) => a + b, 0).toLocaleString()
+                }
+            }
+            
+            class DataMapper {
+                constructor(data, series) {
+                    this.data = data
+                    this.mappedData = {}
+                    this.series = series
+                    this.mapData()
+                }
+
+                mapData() {      
+                    this.data.forEach(el => {
+                        Object.keys(this.series).forEach(cat => {
+                            this.mappedData[el.jurisdiction_of_occurrence] = this.mappedData[el.jurisdiction_of_occurrence] || {}
+                            this.mappedData[el.jurisdiction_of_occurrence][el.mmwryear] = this.mappedData[el.jurisdiction_of_occurrence][el.mmwryear] || {}
+                            this.mappedData[el.jurisdiction_of_occurrence][el.mmwryear][cat] = this.mappedData[el.jurisdiction_of_occurrence][el.mmwryear][cat] || {
+                                label: `${this.series[cat]} (${el.mmwryear})`,
+                                borderColor: el.mmwryear === '2020' ? 'red' : 'blue',
+                                id: cat
+                            }
+                            this.mappedData[el.jurisdiction_of_occurrence][el.mmwryear][cat].data = this.mappedData[el.jurisdiction_of_occurrence][el.mmwryear][cat].data || []
+                            this.mappedData[el.jurisdiction_of_occurrence][el.mmwryear][cat].data.push(parseInt(el[cat]))
+                        })
+                    })
+                }
+
+                get() {
+                    return this.mappedData
+                }
+            }
+
+            var selector = {
+                "Alabama": "Alabama",
+                "Alaska": "Alaska",
+                "Arizona": "Arizona",
+                "Arkansas": "Arkansas",
+                "California": "California",
+                "Colorado": "Colorado",
+                "Connecticut": "Connecticut",
+                "Delaware": "Delaware",
+                "District of Columbia": "District of Columbia",
+                "Florida": "Florida",
+                "Georgia": "Georgia",
+                "Hawaii": "Hawaii",
+                "Idaho": "Idaho",
+                "Illinois": "Illinois",
+                "Indiana": "Indiana",
+                "Iowa": "Iowa",
+                "Kansas": "Kansas",
+                "Kentucky": "Kentucky",
+                "Louisiana": "Louisiana",
+                "Maine": "Maine",
+                "Maryland": "Maryland",
+                "Massachusetts": "Massachusetts",
+                "Michigan": "Michigan",
+                "Minnesota": "Minnesota",
+                "Mississippi": "Mississippi",
+                "Missouri": "Missouri",
+                "Montana": "Montana",
+                "Nebraska": "Nebraska",
+                "Nevada": "Nevada",
+                "New Hampshire": "New Hampshire",
+                "New Jersey": "New Jersey",
+                "New Mexico": "New Mexico",
+                "New York": "New York",
+                "New York City": "New York City",
+                "North Carolina": "North Carolina",
+                "North Dakota": "North Dakota",
+                "Ohio": "Ohio",
+                "Oklahoma": "Oklahoma",
+                "Oregon": "Oregon",
+                "Pennsylvania": "Pennsylvania",
+                "Puerto Rico": "Puerto Rico",
+                "Rhode Island": "Rhode Island",
+                "South Carolina": "South Carolina",
+                "South Dakota": "South Dakota",
+                "Tennessee": "Tennessee",
+                "Texas": "Texas",
+                "Utah": "Utah",
+                "Vermont": "Vermont",
+                "Virginia": "Virginia",
+                "Washington": "Washington",
+                "West Virginia": "West Virginia",
+                "Wisconsin": "Wisconsin",
+                "Wyoming": "Wyoming",
+                "United States": "United States"
+            }
+
+            var series = {
+                'all_cause': 'All causes', 
+                'natural_cause': 'Natural causes',
+                'septicemia_a40_a41': 'Septicemia',
+                'malignant_neoplasms_c00_c97': 'Malignant Neoplasms',
+                'diabetes_mellitus_e10_e14': 'Diabetes',
+                'alzheimer_disease_g30': 'Alzheimer Disease',
+                'influenza_and_pneumonia_j09_j18': 'Influenza and Pneumonia',
+                'chronic_lower_respiratory': 'Chronic Lower Respiratory',
+                'other_diseases_of_respiratory': 'Other Diseases of Respiratory',
+                'nephritis_nephrotic_syndrome': 'Nephritis Nephrotic Syndrome',
+                'symptoms_signs_and_abnormal': 'Symptom Signs and Abnormal',
+                'diseases_of_heart_i00_i09': 'Diseases of Heart',
+                'cerebrovascular_diseases': 'Cerebrovascular Diseases',
+                'covid_19_u071_multiple_cause_of_death': 'COVID-19 Multiple',
+                'covid_19_u071_underlying_cause_of_death': 'Underlying COVID-19'
+            }
+
+            var chartConfigs = [{type: 'line'}]
+
+            var mappedData = (new DataMapper(data, series)).get()
+
+            var controls = new Controls(() => dashboard.update(), 'controls')
+            controls.addSelector(selector, 'state', 'United States')
+            controls.addCheckboxes(series, 'causes', ['all_cause', 'covid_19_u071_underlying_cause_of_death'])
+
+            var dashboard = new Dashboard(chartConfigs, mappedData, 'graphs')
+            dashboard.update()
+
+            var summary = (new Summary()).createSummary(mappedData)
         </script>
     </body>
 </html>

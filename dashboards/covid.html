@@ -3,205 +3,67 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>COVID-19 Graphs</title>
+        <link rel="stylesheet" href="shared/styles.css" type="text/css">
         <link rel="preconnect" href="https://fonts.gstatic.com">
-        <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet"> 
-        <style>
-            html {
-                font-family: 'Montserrat', sans-serif;
-                font-size: 1.25rem;
-                background-color: #fff;
-            }
-
-            #app {
-                padding: 0 1rem; 
-                max-width: 1400px; 
-                margin: auto;
-            }
-
-            .causes > div {
-                width: 300px;
-                font-size: 0.8rem;
-                padding: 10px 0;
-                cursor: pointer;
-            }
-
-            .causes label {
-                cursor: pointer;
-                padding-left: 5px;
-            }
-
-            .causes {
-                display: flex;
-                flex-wrap: wrap;
-                justify-content: center;
-            }
-
-            .summary {
-                text-align: center; 
-                border: 1px solid #333; 
-                background-color: #efefef;
-            }
-
-            .disclaimer {
-                text-align: center;
-                font-size: 0.8rem;
-                font-style: italic;
-                margin: 20px 0;
-            }
-
-            .summary span {
-                font-weight: bold;
-            }
-
-            .summary > div {
-                padding: 10px 0;
-            }
-
-            .container {
-                margin: 40px 0;
-            }
-
-            #state {
-                width: 100%; 
-                height: 40px;
-            }
-
-            @media only screen and (min-width: 1000px) {
-                .container {
-                    display: flex;
-                    flex-wrap: wrap;
-                }
-
-                .container > .controls {
-                    width: 20%;
-                    padding-left: 5%;
-                    order: 2;
-                }
-
-                .container > #graphs {
-                    width: 75%;
-                    order: 1;
-                }
-            }
-        </style>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400;0,700;1,400&display=swap"> 
+        <script src='./shared/Controls.js'></script>
         <script>
             class Dashboard {
-                constructor(data) {
+                constructor(chartConfigs, data, id) {
+                    this.chartOptions = {
+                        scales: {
+                            yAxes: [{
+                                ticks: {
+                                    beginAtZero: true
+                                }
+                            }]
+                        },
+                        title: {
+                            display: true,
+                            fontSize: '32',
+                            fontColor: '#333'
+                        }
+                    }
+                    this.chartConfigs = chartConfigs
                     this.data = data
-                    this.mappedData = {}
-                    this.chart1 = null
-                    this.chart2 = null
+                    this.charts = []   
+                    this.id = id              
 
-                    this.mapData()
                     this.createChart()
                 }
 
-                mapData() {
-                    function color(state, date) {
-                        if (mandates[state] === -1) {
-                            return 'grey'
-                        } else if (mandates[state] === 0 || date < mandates[state]) {
-                            return 'red'
-                        } else {
-                            return 'blue'
-                        }
-                    }
-
-                    this.data.forEach(el =>{
-                        this.mappedData[el.state] = this.mappedData[el.state] || {}
-                        
-                        this.mappedData[el.state]['new'] = this.mappedData[el.state]['new'] || {}
-                        this.mappedData[el.state]['new'].data = this.mappedData[el.state]['new'].data || []
-                        this.mappedData[el.state]['new'].colors = this.mappedData[el.state]['new'].colors || []
-                        this.mappedData[el.state]['new'].dates = this.mappedData[el.state]['new'].dates || []
-                        this.mappedData[el.state]['new'].data.unshift(el.positiveIncrease)
-                        this.mappedData[el.state]['new'].colors.unshift(color(el.state, el.date))
-                        this.mappedData[el.state]['new'].dates.unshift(el.date)
-        
-                        this.mappedData[el.state]['total'] = this.mappedData[el.state]['total'] || {}
-                        this.mappedData[el.state]['total'].data = this.mappedData[el.state]['total'].data || []
-                        this.mappedData[el.state]['total'].colors = this.mappedData[el.state]['total'].colors || []
-                        this.mappedData[el.state]['total'].dates = this.mappedData[el.state]['total'].dates || []
-                        this.mappedData[el.state]['total'].data.unshift(el.positive)
-                        this.mappedData[el.state]['total'].colors.unshift(color(el.state, el.date))
-                        this.mappedData[el.state]['total'].dates.unshift(el.date)
-                    })
-                }
-
                 createChart() {
-                    var ctx1 =  document.getElementById('graph1').getContext('2d')
-                    this.chart1 = new Chart(ctx1, {
-                        type: 'bar',
-                        data: {},
-                        options: {
-                            scales: {
-                                yAxes: [{
-                                    ticks: {
-                                        beginAtZero: true
-                                    }
-                                }]
-                            },
-                            title: {
-                                display: true,
-                                fontSize: '32',
-                                fontColor: '#333',
-                                text: 'New positive cases'
-                            },
-                            legend: {
-                                display: false
-                            }
-                        }
-                    })
+                    var graphs = document.getElementById(this.id)
 
-                    var ctx2 =  document.getElementById('graph2').getContext('2d')
-                    this.chart2 = new Chart(ctx2, {
-                        type: 'line',
-                        data: {},
-                        options: {
-                            scales: {
-                                yAxes: [{
-                                    ticks: {
-                                        beginAtZero: true
-                                    }
-                                }]
-                            },
-                            title: {
-                                display: true,
-                                fontSize: '32',
-                                fontColor: '#333',
-                                text: 'Total cases'
-                            },
-                            legend: {
-                                display: false
-                            }
-                        }
+                    this.chartConfigs.forEach(chart => {
+                        var canvas = document.createElement('canvas')
+                        canvas.id = chart.id
+                        canvas.height = 250 / this.chartConfigs.length
+                        graphs.appendChild(canvas)
+                        
+                        this.charts.push(new Chart(canvas.getContext('2d'), {
+                            type: chart.type,
+                            data: {},
+                            options: this.chartOptions
+                        }))
                     })
                 }
 
                 update() {
-                    var typeSelector = document.getElementById("type")
-                    var stateSelector = document.getElementById("state")
-                    var state = stateSelector.value
+                    var state = document.getElementById('state').value
 
-                    this.chart1.data = {
-                        labels: this.mappedData[state]['new'].dates,
-                        datasets: [{
-                            data: this.mappedData[state]['new'].data,
-                            backgroundColor: this.mappedData[state]['new'].colors,
-                            borderColor: this.mappedData[state]['new'].colors
-                        }]
-                    }
-                    this.chart1.update();
-
-                    this.chart2.data = {
-                        labels: this.mappedData[state]['total'].dates,
-                        datasets: [{
-                            data: this.mappedData[state]['total'].data,
-                            backgroundColor: this.mappedData[state]['total'].colors,
-                            borderColor: this.mappedData[state]['total'].colors
-                        }]
-                    }
-                    this.chart2.update();
+                    this.chartConfigs.forEach((config, i) => {
+                        this.charts[i].data = {
+                            labels: this.data[state][config.id].dates,
+                            datasets: [{
+                                data: this.data[state][config.id].data,
+                                backgroundColor: this.data[state][config.id].colors,
+                                borderColor: this.data[state][config.id].colors
+                            }]
+                        }
+                        this.charts[i].options.title.text = `${config.label} Cases`
+                        this.charts[i].update();
+                    })
                 }
             }
         </script>
@@ -226,69 +88,8 @@
             </p>
             
             <div class='container'>
-                <div class='controls'>
-                    <h3>State/Territory</h3>
-                    <select name="state" id="state" onchange="dashboard.update()">
-                        <option></option>
-                        <option value="AL">AL</option>
-                        <option value="AK">AK</option>
-                        <option value="AZ">AZ</option>
-                        <option value="AR">AR</option>
-                        <option value="AS">AS</option>
-                        <option value="CA">CA</option>
-                        <option value="CO">CO</option>
-                        <option value="CT">CT</option>
-                        <option value="DC">DC</option>
-                        <option value="DE">DE</option>
-                        <option value="FL">FL</option>
-                        <option value="GA">GA</option>
-                        <option value="GU">GU</option>
-                        <option value="HI">HI</option>
-                        <option value="ID">ID</option>
-                        <option value="IL">IL</option>
-                        <option value="IN">IN</option>
-                        <option value="IA">IA</option>
-                        <option value="KS">KS</option>
-                        <option value="KY">KY</option>
-                        <option value="LA">LA</option>
-                        <option value="ME">ME</option>
-                        <option value="MD">MD</option>
-                        <option value="MA">MA</option>
-                        <option value="MI">MI</option>
-                        <option value="MN">MN</option>
-                        <option value="MS">MS</option>
-                        <option value="MO">MO</option>
-                        <option value="MP">MP</option>
-                        <option value="MT">MT</option>
-                        <option value="NE">NE</option>
-                        <option value="NV">NV</option>
-                        <option value="NH">NH</option>
-                        <option value="NJ">NJ</option>
-                        <option value="NM">NM</option>
-                        <option value="NY">NY</option>
-                        <option value="NC">NC</option>
-                        <option value="ND">ND</option>
-                        <option value="OH">OH</option>
-                        <option value="OK">OK</option>
-                        <option value="OR">OR</option>
-                        <option value="PA">PA</option>
-                        <option value="PR">PR</option>
-                        <option value="RI">RI</option>
-                        <option value="SC">SC</option>
-                        <option value="SD">SD</option>
-                        <option value="TN">TN</option>
-                        <option value="TX">TX</option>
-                        <option value="UT">UT</option>
-                        <option value="VT">VT</option>
-                        <option value="VA">VA</option>
-                        <option value="VI">VI</option>
-                        <option value="WA">WA</option>
-                        <option value="WV">WV</option>
-                        <option value="WI">WI</option>
-                        <option value="WY">WY</option>
-                    </select>
-                </div>
-                
+                <div id='controls'></div>
+
                 <div id="graphs">
                     <canvas id='graph1' height=125></canvas>
                     <canvas id='graph2' height=125></canvas>
@@ -310,7 +111,112 @@
         <script src="./case-data.js"></script>
         <script src="./mask-mandates.js"></script>
         <script>
-            var dashboard = new Dashboard(data)
+            class DataMapper {
+                constructor(data, series) {
+                    this.data = data
+                    this.mappedData = {}
+                    this.series = series
+                    this.mapData()
+                }
+
+                mapData() {      
+                    function color(state, date) {
+                        if (mandates[state] === -1) {
+                            return 'grey'
+                        } else if (mandates[state] === 0 || date < mandates[state]) {
+                            return 'red'
+                        } else {
+                            return 'blue'
+                        }
+                    }
+
+                    this.data.forEach(el =>{
+                        this.series.forEach(cat => {
+                            this.mappedData[el.state] = this.mappedData[el.state] || {}
+                            this.mappedData[el.state][cat.id] = this.mappedData[el.state][cat.id] || {}
+                            this.mappedData[el.state][cat.id].data = this.mappedData[el.state][cat.id].data || []
+                            this.mappedData[el.state][cat.id].colors = this.mappedData[el.state][cat.id].colors || []
+                            this.mappedData[el.state][cat.id].dates = this.mappedData[el.state][cat.id].dates || []
+                            this.mappedData[el.state][cat.id].data.unshift(el[cat.id])
+                            this.mappedData[el.state][cat.id].colors.unshift(color(el.state, el.date))
+                            this.mappedData[el.state][cat.id].dates.unshift(el.date)
+                        })
+                    })
+                }
+
+                get() {
+                    return this.mappedData
+                }
+            }
+
+            var selector = {
+                "AK": "AK",
+                "AL": "AL",
+                "AR": "AR",
+                "AS": "AS",
+                "AZ": "AZ",
+                "CA": "CA",
+                "CO": "CO",
+                "CT": "CT",
+                "DC": "DC",
+                "DE": "DE",
+                "FL": "FL",
+                "GA": "GA",
+                "GU": "GU",
+                "HI": "HI",
+                "IA": "IA",
+                "ID": "ID",
+                "IL": "IL",
+                "IN": "IN",
+                "KS": "KS",
+                "KY": "KY",
+                "LA": "LA",
+                "MA": "MA",
+                "MD": "MD",
+                "ME": "ME",
+                "MI": "MI",
+                "MN": "MN",
+                "MO": "MO",
+                "MP": "MP",
+                "MS": "MS",
+                "MT": "MT",
+                "NC": "NC",
+                "ND": "ND",
+                "NE": "NE",
+                "NH": "NH",
+                "NJ": "NJ",
+                "NM": "NM",
+                "NV": "NV",
+                "NY": "NY",
+                "OH": "OH",
+                "OK": "OK",
+                "OR": "OR",
+                "PA": "PA",
+                "PR": "PR",
+                "RI": "RI",
+                "SC": "SC",
+                "SD": "SD",
+                "TN": "TN",
+                "TX": "TX",
+                "UT": "UT",
+                "VA": "VA",
+                "VI": "VI",
+                "VT": "VT",
+                "WA": "WA",
+                "WI": "WI",
+                "WV": "WV",
+                "WY": "WY"
+            }
+
+            var chartConfig = [{id: 'positiveIncrease', label: 'New', type: 'line'}, {id: 'total', label: 'Total', type: 'bar'}]
+
+            var mappedData = (new DataMapper(data, chartConfig)).get()
+
+            var controls = new Controls(() => dashboard.update(), 'controls')
+            controls.addSelector(selector, 'state', 'ND')
+
+            var dashboard = new Dashboard(chartConfig, mappedData, 'graphs')
+            dashboard.update()
         </script>
     </body>
 </html>
