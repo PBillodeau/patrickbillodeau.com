@@ -2,6 +2,7 @@
 layout: post
 title: "Docker: Gluing Together Stuff I Don't Understand"
 excerpt: Docker is a tool for building and running applications, with all its dependencies, in an isolated environment. It's free, open-source, and runs on pretty much anything Linux. As of February 2020, there were over 6 million repositories on Docker hub. 6 million packaged applications all ready to be downloaded and used. The Docker ecosystem is huge. 
+image: docker-cover.png
 ---
 
 Docker is a tool for building and running applications, with all its dependencies, in an isolated environment. It's free, open-source, and runs on pretty much anything Linux. As of February 2020, there were over [6 million](https://www.docker.com/blog/introducing-the-docker-index/) repositories on Docker hub. 6 million packaged applications all ready to be downloaded and used. The Docker ecosystem is huge. 
