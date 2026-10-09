@@ -111,22 +111,31 @@ a {
   margin-inline: auto;
   padding-block: 76px 106px;
   display: grid;
-  grid-template-columns: 1.15fr 0.85fr;
+  grid-template-columns: minmax(0, 1fr);
   align-items: center;
-  gap: 3.5rem;
+  gap: clamp(2rem, 5vw, 4rem);
   border-bottom: 1px solid var(--rule);
   overflow: hidden;
 }
 
 .hero-copy {
+  width: fit-content;
+  max-width: 100%;
+  justify-self: center;
   z-index: 1;
   padding-bottom: 0.75rem;
   animation: enter 650ms ease-out both;
 }
 
+.hero-heading {
+  display: flex;
+  align-items: center;
+  gap: clamp(1.5rem, 4vw, 3rem);
+  margin-bottom: 1.25rem;
+}
+
 .eyebrow,
 .section-label,
-.portrait-note,
 .article-kicker,
 .hero-index {
   font-family: var(--mono);
@@ -178,6 +187,39 @@ p {
   line-height: 1.7;
 }
 
+.hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+.contact-link {
+  min-height: 44px;
+  padding: 0.7rem 1rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+  border: 1px solid var(--green);
+  background: var(--green);
+  color: var(--paper-bright);
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background-color 150ms ease, border-color 150ms ease;
+}
+
+.contact-link:hover {
+  border-color: var(--ink);
+  background: var(--ink);
+}
+
+.contact-link:focus-visible,
+.footer-contact:focus-visible {
+  outline: 2px solid var(--coral);
+  outline-offset: 3px;
+}
+
 .text-link {
   display: inline-flex;
   align-items: center;
@@ -200,20 +242,9 @@ p {
 
 .portrait-wrap {
   position: relative;
-  justify-self: center;
-  width: min(100%, 400px);
-  aspect-ratio: 0.84;
-  margin: 10px 20px 28px 0;
-  animation: enter 700ms 100ms ease-out both;
-}
-
-.portrait-backdrop {
-  position: absolute;
-  inset: 20px -18px -16px 18px;
-  border: 1px solid var(--green);
-  border-radius: 48% 48% 4px 4px;
-  background: var(--lime);
-  transform: rotate(3deg);
+  flex: 0 0 auto;
+  width: min(100%, 180px);
+  aspect-ratio: 1;
 }
 
 .portrait {
@@ -221,23 +252,9 @@ p {
   display: block;
   width: 100%;
   height: 100%;
-  border: 8px solid var(--paper-bright);
   border-radius: 48% 48% 4px 4px;
   object-fit: cover;
   object-position: center 42%;
-}
-
-.portrait-note {
-  position: absolute;
-  right: -12px;
-  bottom: -29px;
-  color: var(--green);
-  font-size: 0.57rem;
-}
-
-.portrait-note span {
-  padding-inline: 0.3rem;
-  color: var(--coral);
 }
 
 .hero-index {
@@ -463,6 +480,17 @@ p {
   font-size: 0.65rem;
 }
 
+.footer-contact {
+  color: var(--green);
+  font-size: 0.88rem;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.footer-contact:hover {
+  color: var(--coral);
+}
+
 @keyframes enter {
   from {
     opacity: 0;
@@ -499,7 +527,7 @@ p {
 
   .hero {
     min-height: 570px;
-    grid-template-columns: 1.1fr 0.9fr;
+    grid-template-columns: minmax(0, 1fr);
     gap: 1.4rem;
   }
 
@@ -507,9 +535,6 @@ p {
     font-size: 4.5rem;
   }
 
-  .portrait-wrap {
-    width: min(100%, 340px);
-  }
 }
 
 @media (max-width: 620px) {
@@ -548,7 +573,17 @@ p {
     min-height: auto;
     padding-block: 66px 70px;
     grid-template-columns: 1fr;
-    gap: 3rem;
+    gap: 1.75rem;
+  }
+
+  .hero-copy {
+    width: 100%;
+    justify-self: stretch;
+  }
+
+  .hero-heading {
+    justify-content: space-between;
+    gap: 0.75rem;
   }
 
   .hero-copy {
@@ -561,7 +596,7 @@ p {
   }
 
   .hero h1 {
-    font-size: 4rem;
+    font-size: 3.25rem;
   }
 
   .hero-intro {
@@ -570,13 +605,7 @@ p {
   }
 
   .portrait-wrap {
-    width: min(76%, 300px);
-    margin: 0 auto 1.25rem;
-  }
-
-  .portrait-note {
-    right: -1.2rem;
-    font-size: 0.49rem;
+    width: min(100%, 72px);
   }
 
   .hero-index {
