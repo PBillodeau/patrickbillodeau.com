@@ -1,0 +1,238 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#f4f4e8">
+    <meta name="description" content="A practical introduction to Docker: run WordPress, understand containers, and see what happens under the hood.">
+    <meta property="og:title" content="Docker: Gluing Together Stuff I Don't Understand | Patrick Billodeau">
+    <meta property="og:description" content="From running a WordPress site in a few commands to peeking underneath the hood of containers.">
+    <meta property="og:type" content="article">
+    <title>Docker: Gluing Together Stuff I Don't Understand | Patrick Billodeau</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,500;9..144,600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/assets/styles.css">
+    <link rel="stylesheet" href="/assets/article.css">
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <header class="site-header">
+      <a class="wordmark" href="../" aria-label="Patrick Billodeau, home">PB<span>.</span></a>
+      <nav aria-label="Main navigation">
+        <a href="../#about">About</a>
+        <a href="../#writing">Writing</a>
+        <a href="https://github.com/PBillodeau/" target="_blank" rel="noreferrer">GitHub <span aria-hidden="true">↗</span></a>
+        <a href="https://www.linkedin.com/in/patrickbillodeau/" target="_blank" rel="noreferrer">LinkedIn <span aria-hidden="true">↗</span></a>
+        <a class="nav-resume" href="../assets/resume.pdf" target="_blank" rel="noreferrer">Resume <span aria-hidden="true">↗</span></a>
+      </nav>
+    </header>
+
+    <main id="main" class="post-shell">
+      <article>
+        <header class="post-header">
+          <a class="post-back" href="../#writing"><span aria-hidden="true">←</span> Back to writing</a>
+          <p class="post-kicker"><span>Field note 01</span><span aria-hidden="true">/</span><span>A practical introduction to Docker</span></p>
+          <h1>Docker: Gluing Together Stuff I Don't Understand<span>.</span></h1>
+          <p class="post-deck">From running a WordPress site in a few commands to peeking underneath the hood of containers.</p>
+          <div class="post-rule"><span>Patrick Billodeau</span><span>Docker <i aria-hidden="true">·</i> Containers <i aria-hidden="true">·</i> Development</span></div>
+        </header>
+
+        <div class="post-content">
+          <p>Docker is a tool for building and running applications, with all their dependencies, in an isolated environment. It's free, open-source, and runs on pretty much anything Linux. As of February 2020, there were over <a href="https://www.docker.com/blog/introducing-the-docker-index/">6 million</a> repositories on Docker Hub. Six million packaged applications, ready to be downloaded and used. The Docker ecosystem is huge.</p>
+
+          <section aria-labelledby="goals-title">
+            <h2 id="goals-title">Goals</h2>
+            <p>With this article I want you to:</p>
+            <ol>
+              <li>Understand what makes Docker useful</li>
+              <li>Be able to get a WordPress site up and running</li>
+              <li>Peek underneath the hood of Docker</li>
+              <li>Know where to go from here</li>
+            </ol>
+          </section>
+
+          <figure class="post-figure">
+            <img src="https://imgs.xkcd.com/comics/containers.png" alt="xkcd comic about the complications of containers" loading="lazy">
+            <figcaption>The world of Docker is not without its skeptics.</figcaption>
+          </figure>
+
+          <section aria-labelledby="special-title">
+            <h2 id="special-title">What makes Docker special?</h2>
+            <p>I like to imagine the origin of Docker as this:</p>
+            <blockquote class="dialogue">
+              <p><strong>Developer:</strong> “It works on my machine!”</p>
+              <p><strong>Supervisor:</strong> “Well, we can't ship your machine to production!”</p>
+              <p><strong>Developer:</strong> Unless...</p>
+              <p><strong>Developer:</strong> “So yeah, not sure why it only works on my machine, but I created this tool that allows me to deploy my machine to production. Problem solved!”</p>
+            </blockquote>
+            <p>It sounds ridiculous, and it is, but the ramifications were huge. Applications could be bundled with all of their dependencies. Config could be handled by the developer, not the user. People started to run with it.</p>
+            <p>People could A/B test similar applications quickly, without worrying about the implementation of each. They could run the applications without worrying about polluting their host machine. As soon as they were done with an application, they could remove it. The application was completely compartmentalized. The barrier to entry was dramatically reduced. People could spend more time developing their ideas rather than setting up someone else's.</p>
+            <p>Let me show you what I mean.</p>
+          </section>
+
+          <section aria-labelledby="getting-started-title">
+            <h2 id="getting-started-title">Getting started with Docker</h2>
+            <h3>Installing Docker</h3>
+            <p>Many cloud providers now have operating systems with Docker pre-installed. I've personally used Digital Ocean, and with a couple of clicks I was up and running. If you'd like to install Docker locally, instructions can be found <a href="https://docs.docker.com/get-docker/">here</a>. If you're using Ubuntu, the instructions can be specifically found <a href="https://docs.docker.com/engine/install/ubuntu/#install-using-the-repository">here</a>. If you're a Windows user, I've also found it to work really well with WSL2.</p>
+
+            <h3>Running Docker</h3>
+            <p>With Docker installed, we'll start pretty basic: a simple WordPress site. Sure, there are a lot of WordPress hosting services, but we want to do this ourselves. Normally, we'd need to download PHP, Apache, and MySQL and configure them all properly (especially Apache). If you're like me, something inevitably goes wrong <em>every</em> time. (The number of times I've forgotten to increase the MAX_POST_SIZE in PHP is way too high...)</p>
+            <p>With Docker, it's much simpler. Only three commands.</p>
+            <p>One to set up our network (so our containers can talk to each other):</p>
+            <pre><code class="language-bash">docker network create wordpress</code></pre>
+            <p>One to run our MySQL container:</p>
+            <pre><code class="language-bash">sudo docker run --name mysql --network=wordpress -e MYSQL_ROOT_PASSWORD=wordpress -e MYSQL_DATABASE=wordpress -e MYSQL_USER=wordpress -e MYSQL_PASSWORD=wordpress -d mysql:latest</code></pre>
+            <p>Breakdown:</p>
+            <ol>
+              <li><code>docker run</code> tells Docker we want to start a container</li>
+              <li><code>--name mysql</code> names the container</li>
+              <li><code>--network=wordpress</code> connects to the “wordpress” network so it can communicate with other containers on the network</li>
+              <li><code>-e MYSQL_ROOT_PASSWORD=wordpress -e MYSQL_DATABASE=wordpress -e MYSQL_USER=wordpress -e MYSQL_PASSWORD=wordpress</code> sets the MySQL user, password, and database</li>
+              <li><code>-d</code> runs the container in the background</li>
+              <li><code>mysql:latest</code> uses the latest MySQL Docker image</li>
+            </ol>
+            <p>And one to run the WordPress application with Apache and PHP:</p>
+            <pre><code class="language-bash">sudo docker run --name wordpress --network=wordpress -p 80:80 -d wordpress:latest</code></pre>
+            <p>Command breakdown:</p>
+            <ol>
+              <li><code>docker run</code> tells Docker we want to start a container</li>
+              <li><code>--name wordpress</code> names the container</li>
+              <li><code>--network=wordpress</code> connects to the “wordpress” network so it can communicate with other containers on the network</li>
+              <li><code>-p 80:80</code> forwards host port 80 to container port 80, so we can access <code>http://localhost</code> in our browser</li>
+              <li><code>-d</code> runs the container in the background</li>
+              <li><code>wordpress:latest</code> uses the latest WordPress Docker image</li>
+            </ol>
+            <p>If you're running these commands locally, you'll be able to access <code>http://localhost</code> to visit your new site. If not, simply replace “localhost” with the IP address of the machine Docker is on. It's that easy.</p>
+
+            <h4>Running Docker without the command line (and other ways to make life easier)</h4>
+            <p>For those of you that wish to avoid the command line as much as possible, Docker also offers a solution. <a href="https://www.portainer.io/">Portainer</a> is a Docker image that allows you to manage your containers through a web UI.</p>
+            <p>With just one more command:</p>
+            <pre><code class="language-bash">sudo docker run --name=portainer -p 9000:9000 -v /var/run/docker.sock:/var/run/docker.sock -d portainer/portainer-ce</code></pre>
+            <p>You can start managing your containers without even touching the command line. Docker not only helps you create applications for end-users, it helps you build out your own infrastructure to make development easier. You can build out your dev-ops pipeline like Legos. And this is really where you can take your development to the next level. You can easily install tools to organize, deploy, and understand your custom application.</p>
+
+            <h4>Other tools I've found useful</h4>
+            <ol>
+              <li><a href="https://hub.docker.com/r/jenkins/jenkins">Jenkins</a> (continuous integration)</li>
+              <li><a href="https://hub.docker.com/_/logstash">Logstash</a> (application logging), along with <a href="https://hub.docker.com/_/elasticsearch">Elasticsearch</a> and <a href="https://hub.docker.com/_/kibana">Kibana</a></li>
+              <li><a href="https://hub.docker.com/_/redmine">Redmine</a> (project management)</li>
+            </ol>
+
+            <h4>Bonus tool</h4>
+            <p>Docker doesn't have to <em>just</em> be about development either. There are fun things too. Try running:</p>
+            <pre><code class="language-bash">sudo docker run --name=mario -p 8600:8080 -d pengbai/docker-supermario</code></pre>
+            <p>Then navigate your web browser to <code>http://localhost:8600</code> to play infinite Mario.</p>
+          </section>
+
+          <section aria-labelledby="what-is-docker-title">
+            <h2 id="what-is-docker-title">What is Docker?</h2>
+            <p>Really, I think the answer is a bit boring: Docker is just an abstraction. It's a tool to give developers an easy-to-use interface to create and manage containers.</p>
+            <p>Still, it's interesting to know what we're working with. Docker comes in two parts: the client and the server.</p>
+            <h3>Docker client</h3>
+            <p>The client is the commands you run: <code>docker run</code>, <code>docker pull</code>, <code>docker ps</code>, and so on.</p>
+            <h3>Docker daemon (server)</h3>
+            <p>The commands communicate with the server, or Docker daemon, which runs in the background and does all of the actual heavy lifting.</p>
+            <h3>Client-server communication</h3>
+            <p>After running a command, the Docker client sends the message to Docker's socket (<code>/var/run/docker.sock</code>). The communication is done through a REST API.</p>
+            <p>Fun fact: because Docker uses a REST API, <a href="https://superuser.com/questions/834307/can-curl-send-requests-to-sockets">curl can actually be used as a Docker client.</a></p>
+            <p>Containerization is really the underlying technology that's interesting here, though.</p>
+          </section>
+
+          <section aria-labelledby="containers-title">
+            <h2 id="containers-title">What are containers and containerization?</h2>
+            <p>Conceptually, I think containers make sense to most people. They “contain” an application and its dependencies, but anything deeper than that always seemed like magic to me. It wasn't until I took a deeper look and tried creating my own “pseudo-container” (I'll call it a faketainer) that things started to fit into place.</p>
+            <h3>Creating our own “faketainer” without Docker</h3>
+            <p>Real containerization is a bit more complicated than this. Real containers isolate processes from each other, create networks, and delegate resources specifically. Our faketainer does none of that. However, our faketainer is a lot easier to visualize and understand, and will really help get you “half-way there.”</p>
+            <p>Here are the commands to create our faketainer:</p>
+            <pre><code class="language-bash">#!/bin/sh
+
+# Pull apk-tools-static
+curl -LO http://dl-cdn.alpinelinux.org/alpine/latest-stable/main/x86_64/apk-tools-static-2.10.5-r1.apk
+tar -xzf apk-tools-static-*.apk
+
+# Create rootfs
+./sbin/apk.static -X http://dl-cdn.alpinelinux.org/alpine/latest-stable/main -U --allow-untrusted -p rootfs --initdb add alpine-base
+
+# Setup resolv.conf to enable networking in rootfs
+cp -L /etc/resolv.conf rootfs/etc/
+
+# Setup apk repositories so we can pull packages in rootfs
+mkdir -p rootfs/etc/apk
+echo "http://dl-cdn.alpinelinux.org/alpine/latest-stable/community" &gt; rootfs/etc/apk/repositories
+echo "http://dl-cdn.alpinelinux.org/alpine/latest-stable/main" &gt;&gt; rootfs/etc/apk/repositories
+
+# Cleanup leftovers on "host"
+rm -rf ./sbin apk-tools-static-2.10.5-r1.apk</code></pre>
+            <p>For this faketainer, I've chosen <a href="https://alpinelinux.org/">Alpine Linux</a> as the base. Alpine Linux is used often in containers because it's an incredibly small distro, but still comes along with an easy-to-use package manager. If you're interested in finding out more, check out <a href="https://hackernoon.com/you-should-use-alpine-linux-instead-of-ubuntu-yb193ujt">You Should Use Alpine Linux Instead of Ubuntu</a>.</p>
+            <p>After running this script, a directory called <code>rootfs</code> should have been created. We can then chroot (change root directory) to it:</p>
+            <pre><code class="language-bash">chroot rootfs ash</code></pre>
+            <p>To enter our faketainer. To demonstrate, let's install PHP into our container by running:</p>
+            <pre><code class="language-bash">apk add php</code></pre>
+            <p>Once complete, we can run:</p>
+            <pre><code class="language-bash">php --version</code></pre>
+            <p>And see:</p>
+            <pre><code>PHP 7.3.25 (cli) (built: Nov 26 2020 13:43:59) ( NTS )
+Copyright (c) 1997-2018 The PHP Group
+Zend Engine v3.3.25, Copyright (c) 1998-2018 Zend Technologies</code></pre>
+            <p>But if we “log out” (Ctrl+D) from our container, and run the same command on our host:</p>
+            <pre><code>Command 'php' not found, but can be installed with:
+
+sudo apt install php7.4-cli</code></pre>
+            <p>It can't be found. We've successfully “containerized” PHP! At a high level, this is what Docker is doing.</p>
+          </section>
+
+          <section aria-labelledby="next-title">
+            <h2 id="next-title">What's next?</h2>
+            <h3>Docker Compose</h3>
+            <p>The example Docker commands are fairly long and involve a lot of different parameters and settings to work right. <a href="https://docs.docker.com/compose/">Docker Compose</a> gives us a way to put all of that complexity into a simple file to make them easier to run. I almost always use Docker Compose to run my images.</p>
+            <p>For example, with our WordPress site, we had to run a couple of commands that each had a bit of configuration to them. Instead, we could have written a Docker Compose file:</p>
+            <pre><code class="language-yaml">version: '3.3'
+
+services:
+   mysql:
+     image: mysql:latest
+     environment:
+       MYSQL_ROOT_PASSWORD: wordpress
+       MYSQL_DATABASE: wordpress
+       MYSQL_USER: wordpress
+       MYSQL_PASSWORD: wordpress
+
+   wordpress:
+     depends_on:
+       - db
+     image: wordpress:latest
+     ports:
+       - "80:80"</code></pre>
+            <p>And then run</p>
+            <pre><code class="language-bash">docker-compose up -d</code></pre>
+            <p>And you're done. You can then check this file into your version control system to make for an easy-to-use, repeatable process to build out your infrastructure. In a way, this is <a href="https://en.wikipedia.org/wiki/Infrastructure_as_code">infrastructure as code (IaC)</a>.</p>
+
+            <h3>Creating custom images with Dockerfiles</h3>
+            <p>While I think the faketainer is cool, it's a little “hacky.” Docker images are created with Dockerfiles: text files that describe, step by step, what the file structure of the container should look like. Find out more about <a href="https://docs.docker.com/engine/reference/builder/">Dockerfiles</a>.</p>
+
+            <h3>Kubernetes</h3>
+            <p>For Kubernetes, I like to imagine the same developer who came up with Docker:</p>
+            <blockquote class="dialogue">
+              <p><strong>Developer:</strong> “Man, deploying my machine to production was awesome. It's too bad I still have to worry about these servers...”</p>
+              <p><strong>Supervisor:</strong> “Yeah, just a fact of life. You can't deploy to the aether!”</p>
+              <p><strong>Developer:</strong> Unless...</p>
+            </blockquote>
+            <p>And so <a href="https://kubernetes.io/">Kubernetes</a> was born.</p>
+            <p>Kubernetes allows us to manage our containers across multiple machines. This is incredibly useful in scaling applications and creating server redundancy. If one server shuts down, Kubernetes can be set up to move the containers to another, still-running server. It also allows us to use the resources from multiple computers rather than one super-powerful computer. It puts an abstraction layer across every server, so that we can treat all of our servers as “the cloud.” With Kubernetes, software engineers have lost all credibility with hardware engineers. Still awesome, though.</p>
+          </section>
+
+          <section aria-labelledby="final-thoughts-title">
+            <h2 id="final-thoughts-title">Final thoughts</h2>
+            <p>This article was inspired by a talk I wanted to give for <a href="https://curiosityweek2020.sched.com/">Curiosity Week 2020</a>. I hope you found it helpful. If you have any feedback, I'm happy to hear it, or answer any questions you may have. Just <a href="https://www.linkedin.com/in/patrickbillodeau/">send me a message on LinkedIn</a>!</p>
+          </section>
+        </div>
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <a class="wordmark" href="../" aria-label="Patrick Billodeau, home">PB<span>.</span></a>
+      <p>Made with care in Fargo, ND.</p>
+      <a href="#main">Back to top <span aria-hidden="true">↑</span></a>
+    </footer>
+  </body>
+</html>
